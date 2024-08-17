@@ -7,7 +7,7 @@ async function ServerPage() {
   return (
     <UserInfos 
         user={user} 
-        label="Server component" 
+        label="Mes informations" 
     />
   )
 }

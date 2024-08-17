@@ -81,7 +81,7 @@ const SettingsCard = () => {
   return (
     <Card className="w-[600px]">
       <CardHeader>
-        <p className="text-2xl font-semibold text-center">Settings</p>
+        <p className="text-2xl font-semibold text-center">Mon compte</p>
         <CardContent>
           <Form {...form}>
             <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>

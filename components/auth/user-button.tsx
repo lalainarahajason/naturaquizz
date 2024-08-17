@@ -37,7 +37,7 @@ export const UserButton = () => {
                 <LogoutButton>
                     <DropdownMenuItem>
                         <ExitIcon className="w-4 mr-2" />
-                        LogOut
+                        Se déconnecter
                     </DropdownMenuItem>
                 </LogoutButton>
             </DropdownMenuContent>
