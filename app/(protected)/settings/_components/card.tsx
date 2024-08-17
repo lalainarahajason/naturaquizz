@@ -184,8 +184,9 @@ const SettingsCard = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
-                          <SelectItem value={UserRole.USER}>User</SelectItem>
+                          <SelectItem value={UserRole.ADMIN}>ADMIN</SelectItem>
+                          <SelectItem value={UserRole.PREMIUM}>PREMIUM</SelectItem>
+                          <SelectItem value={UserRole.USER}>USER</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
