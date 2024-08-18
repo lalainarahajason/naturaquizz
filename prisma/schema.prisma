@@ -92,6 +92,7 @@ model TwoFactorConfirmation {
 model Quiz {
   id        String     @id @default(cuid())
   title     String
+  slug      String     @unique
   category  String
   questions Question[]
   createdAt DateTime   @default(now())
@@ -102,7 +103,6 @@ model Quiz {
 
 model Question {
   id       String   @id @default(cuid())
-  title    String
   question String
   image    String?
   timer    Int      @default(60)
