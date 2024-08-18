@@ -1,9 +1,18 @@
-import React from 'react'
+"use server";
 
-function page() {
+import { CurrentUser } from "@/lib/auth";
+
+async function Quizz() {
+
+    const user = await CurrentUser();
+    const isPremium = user?.role === 'PREMIUM';
   return (
-    <div>Commencer le quizz</div>
+
+    <>
+    {isPremium && <div>page</div>}
+    </>
+
   )
 }
 
-export default page
+export default Quizz
