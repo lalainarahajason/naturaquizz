@@ -43,18 +43,20 @@ export const NavBar = () => {
   }
 
   return (
-    <nav className="bg-secondary flex justify-between items-center p-4 w-full max-w-[1440px] shadow-sm">
-      <div className="flex gap-x-2">
-        {filteredMenus.map((menu, index) => (
-          <Button
-            key={index}
-            asChild
-            variant={pathname === menu.href ? "default" : "outline"}
-          >
-            <Link href={menu.href}>{menu.label}</Link>
-          </Button>
-        ))}
-      </div>
+    <nav className="bg-secondary flex justify-end items-center p-4 w-full max-w-[1440px] shadow-sm gap-x-2">
+      {/** 
+        <div className="flex gap-x-2">
+          {filteredMenus.map((menu, index) => (
+            <Button
+              key={index}
+              asChild
+              variant={pathname === menu.href ? "default" : "link"}
+            >
+              <Link href={menu.href}>{menu.label}</Link>
+            </Button>
+          ))}
+        </div>
+      */}
       <UserButton />
     </nav>
   );
