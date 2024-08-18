@@ -82,13 +82,7 @@ import {
       {
         groupLabel: "Settings",
         menus: [
-          {
-            href: "/users",
-            label: "Users",
-            active: pathname.includes("/users"),
-            icon: Users,
-            submenus: []
-          },
+          
           {
             href: "/server",
             label: "Account",
@@ -108,25 +102,26 @@ import {
         menus: [
           {
             href: "/admin",
-            label: "Dashboard",
+            label: "Tableau de bord",
             active: pathname.includes("/dashboard"),
             icon: LayoutGrid,
             submenus: []
-          }
-        ]
-      },
-      {
-        groupLabel: "Settings",
-        menus: [
+          },
           {
             href: "/users",
-            label: "Users",
+            label: "Utilisateurs",
             active: pathname.includes("/users"),
             icon: Users,
             submenus: []
           },
+        ]
+      },
+      {
+        groupLabel: "Configurations",
+        menus: [
+          
           {
-            href: "/server",
+            href: "/informations",
             label: "Informations",
             active: pathname.includes("/account"),
             icon: Settings,
