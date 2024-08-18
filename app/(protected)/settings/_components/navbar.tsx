@@ -25,8 +25,8 @@ export const NavBar = () => {
       role: "ADMIN",
     },
     {
-      label: "Mon compte (Premium)",
-      href: "/settings",
+      label: "Quizz (Premium)",
+      href: "/quizz",
       role: "PREMIUM"
     },
     {
