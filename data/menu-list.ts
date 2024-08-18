@@ -2,6 +2,7 @@ import {
     Tag,
     Users,
     Settings,
+    Edit3Icon,
     Bookmark,
     SquarePen,
     LayoutGrid,
@@ -27,7 +28,7 @@ import {
     menus: Menu[];
   };
   
-  export function getMenuList(pathname: string): Group[] {
+  export function getUserMenuList(pathname: string): Group[] {
     return [
       {
         groupLabel: "",
@@ -89,10 +90,53 @@ import {
             submenus: []
           },
           {
-            href: "/account",
+            href: "/server",
             label: "Account",
             active: pathname.includes("/account"),
             icon: Settings,
+            submenus: []
+          }
+        ]
+      }
+    ];
+  }
+
+  export function getAdminMenuList(pathname: string): Group[] {
+    return [
+      {
+        groupLabel: "",
+        menus: [
+          {
+            href: "/admin",
+            label: "Dashboard",
+            active: pathname.includes("/dashboard"),
+            icon: LayoutGrid,
+            submenus: []
+          }
+        ]
+      },
+      {
+        groupLabel: "Settings",
+        menus: [
+          {
+            href: "/users",
+            label: "Users",
+            active: pathname.includes("/users"),
+            icon: Users,
+            submenus: []
+          },
+          {
+            href: "/server",
+            label: "Informations",
+            active: pathname.includes("/account"),
+            icon: Settings,
+            submenus: []
+          },
+          {
+            href: "/settings",
+            label: "Account",
+            active: pathname.includes("/account"),
+            icon: Edit3Icon,
             submenus: []
           }
         ]

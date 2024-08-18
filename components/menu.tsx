@@ -3,7 +3,10 @@ import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { getMenuList } from "../_lib/menu-list";
+import {
+  getUserMenuList,
+  getAdminMenuList,
+} from "../data/menu-list";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -14,13 +17,21 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 
+import { useCurrentUser } from "@/hooks/use-current-user";
+
 interface MenuProps {
   isOpen: boolean | undefined;
 }
 
 export function Menu({ isOpen }: MenuProps) {
+  const user = useCurrentUser();
+
   const pathname = usePathname();
-  const menuList = getMenuList(pathname);
+
+  const userMenuList = getUserMenuList(pathname);
+  const adminMenuList = getAdminMenuList(pathname);
+
+  const menuList = user?.role === "ADMIN" ? adminMenuList : userMenuList;
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -49,7 +60,7 @@ export function Menu({ isOpen }: MenuProps) {
                 <p className="pb-2"></p>
               )}
 
-{menus.map(
+              {menus.map(
                 ({ href, label, icon: Icon, active, submenus }, index) =>
                   submenus.length === 0 ? (
                     <div className="w-full" key={index}>

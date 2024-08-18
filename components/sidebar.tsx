@@ -5,16 +5,17 @@ import { PanelsTopLeft } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { SidebarToggle } from "./sidebar-toggle";
+import { SidebarToggle } from "@/components/sidebar-toggle";
 
-import { useStore } from "../_hooks/use-store";
-import { useSidebarToggle } from "../_hooks/use-sidebar-toggle";
+import { useStore } from "@/hooks/use-store";
+import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 
-import { Menu } from "./menu";
+import { Menu } from "@/components/menu";
 
 
 
 function AdminSidebar() {
+    
   const sidebar = useStore(useSidebarToggle, (state) => state);
 
   return (
@@ -44,7 +45,7 @@ function AdminSidebar() {
                     : "translate-x-0 opacity-100"
                 )}
                 >
-                Brand
+                NaturaQuizz
                 </h1>
             </Link>
             </Button>
