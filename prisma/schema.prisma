@@ -24,6 +24,10 @@ model User {
   role          UserRole @default(USER)
   isTwoFactorEnabled Boolean @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
+
+  // quiz
+  quizzes       Quiz[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -82,4 +86,36 @@ model TwoFactorConfirmation {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+}
+
+// Quiz
+model Quiz {
+  id        String     @id @default(cuid())
+  title     String
+  slug      String     @unique
+  category  String
+  questions Question[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  author    User       @relation(fields: [authorId], references: [id])
+  authorId  String
+}
+
+model Question {
+  id       String   @id @default(cuid())
+  question String
+  image    String?
+  timer    Int      @default(60)
+  answers  Answer[]
+  quiz     Quiz     @relation(fields: [quizId], references: [id])
+  quizId   String
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean
+  order      Int
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
 }

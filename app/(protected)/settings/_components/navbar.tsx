@@ -20,11 +20,6 @@ export const NavBar = () => {
       role: "USER",
     },
     {
-      label: "Admin",
-      href: "/admin",
-      role: "ADMIN",
-    },
-    {
       label: "Quizz (Premium)",
       href: "/quizz",
       role: "PREMIUM"
@@ -34,6 +29,11 @@ export const NavBar = () => {
       href: "/settings",
       role: "USER",
     },
+    {
+      label: "Admin",
+      href: "/admin",
+      role: "ADMIN",
+    }
   ];
 
   const filteredMenus = Menus.filter(menu => menu.role === userRole || menu.role === "USER");
