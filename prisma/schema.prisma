@@ -27,6 +27,7 @@ model User {
 
   // quiz
   quizzes       Quiz[]
+  quizResults   UserQuizResult[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,15 +91,20 @@ model TwoFactorConfirmation {
 
 // Quiz
 model Quiz {
-  id        String     @id @default(cuid())
-  title     String
-  slug      String     @unique
-  category  String
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String
+  image       String?
   questions Question[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  author    User       @relation(fields: [authorId], references: [id])
-  authorId  String
+  
+  author      User       @relation(fields: [authorId], references: [id])
+  authorId    String
+  userQuizResults UserQuizResult[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
 }
 
 model Question {
@@ -118,4 +124,17 @@ model Answer {
   order      Int
   question   Question @relation(fields: [questionId], references: [id])
   questionId String
+}
+
+model UserQuizResult {
+  id             String   @id @default(cuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+  quiz           Quiz     @relation(fields: [quizId], references: [id])
+  quizId         String
+  completedAt    DateTime @default(now())
+  correctAnswers Int
+  totalQuestions Int
+
+  @@unique([userId, quizId])
 }

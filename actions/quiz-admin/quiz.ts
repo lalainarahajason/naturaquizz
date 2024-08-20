@@ -1,14 +1,54 @@
+"use server"
 
+import { revalidatePath } from 'next/cache'
 import { CurrentUser } from "@/lib/auth";
+import { db } from '@/lib/db';
+import { quizSchema, QuizFormValues } from '@/schemas/quiz';
+import { auth } from '@/auth';
 
-export const createQuiz  = async () => {
+import * as z from "zod";
+
+export const createQuiz  = async ( data: QuizFormValues ) => {
+
+    const session = await auth();
     
-    const user = await CurrentUser();
-    const isAdmin = user?.role === 'ADMIN';
-
     // if user is not admin abort
-    if(!isAdmin) throw new Error('Unauthorized');
+    if (!session || session.user.role !== 'ADMIN') {
+        return {
+            error: "Vous n'avez pas le droit de faire cette action"
+        }
+    }
 
-    return true;
+    try {
+
+        const validateData = quizSchema.safeParse(data);
+
+        if (!validateData.success) {
+            return {
+                error: validateData.error.errors
+            }
+        }
+
+        await db.quiz.create({
+            data: {
+              title: data.title,
+              slug: data.title, // Ajout d'un slug par défaut s'il est optionnel
+              description: data.description,
+              image: data.image,
+              author: { connect: { id: session.user.id } }, // Ajout de l'auteur si nécessaire
+            }
+        });
+
+        return {
+            success: "Quiz enregistré avec succès"
+        };
+          
+    } catch (error) {
+        return {
+            error : "Erreur inattendue"
+        }
+    }
+
+    
 
 }

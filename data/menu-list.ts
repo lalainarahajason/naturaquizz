@@ -6,7 +6,8 @@ import {
     Bookmark,
     SquarePen,
     LayoutGrid,
-    LucideIcon
+    LucideIcon,
+    Plus
   } from "lucide-react";
   
   type Submenu = {
@@ -82,20 +83,21 @@ import {
       {
         groupLabel: "Settings",
         menus: [
+          
           {
-            href: "/users",
-            label: "Users",
-            active: pathname.includes("/users"),
-            icon: Users,
+            href: "/informations",
+            label: "Informations",
+            active: pathname.includes("/informations"),
+            icon: Settings,
             submenus: []
           },
           {
-            href: "/server",
+            href: "/settings",
             label: "Account",
-            active: pathname.includes("/account"),
-            icon: Settings,
+            active: pathname.includes("/settings"),
+            icon: Users,
             submenus: []
-          }
+          },
         ]
       }
     ];
@@ -116,6 +118,18 @@ import {
         ]
       },
       {
+        groupLabel: "Quizz",
+        menus: [
+          {
+            href: "/admin/quizz",
+            label: "Ajouter",
+            active: pathname.includes("/users"),
+            icon: Plus,
+            submenus: []
+          }
+        ]
+      },
+      {
         groupLabel: "Settings",
         menus: [
           {
@@ -126,7 +140,7 @@ import {
             submenus: []
           },
           {
-            href: "/server",
+            href: "/informations",
             label: "Informations",
             active: pathname.includes("/account"),
             icon: Settings,
