@@ -2,25 +2,26 @@
 
 import { useForm, useFieldArray, Control } from "react-hook-form";
 
+
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { quizSchema, QuizFormValues } from "@/schemas/quiz";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 
 import { RoleGate } from "@/components/auth/role-gate";
 import { createQuiz } from "@/actions/quiz-admin/quiz";
 
 import { deleteImage } from "@/actions/quiz-admin/image";
+import { CldUploadButton } from "next-cloudinary";
+import Image from "next/image";
 
-import { CldUploadButton } from 'next-cloudinary';
-
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormField,
@@ -32,17 +33,23 @@ import {
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-function QuizzAdminForm() {
+import {
+  Check,
+  Trash2Icon,
+  Loader2
+} from "lucide-react";
 
+function QuizzAdminForm() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [publicImageId, setPublicImageId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<QuizFormValues>({
     resolver: zodResolver(quizSchema),
     defaultValues: {
       title: "",
       description: "",
-      image: ""
+      image: "",
     },
   });
 
@@ -50,36 +57,47 @@ function QuizzAdminForm() {
     if (imageUrl) {
       data.image = imageUrl;
     }
-    const response = await createQuiz(data);
-    console.log(publicImageId)
-    if (response.success) {
-      form.reset();
-      setImageUrl(null);
-      toast(response.success)
-    } else {
-      // Handle error
-      toast(response.error as string)
-    }
+
+    startTransition(() => {
+
+      createQuiz(data).then((data) => {
+
+        if (data.error) {
+          toast(data.error as string);
+        }
+
+        if (data.success) {
+          form.reset();
+          setImageUrl(null);
+          toast(data.success);
+        }
+      });
+    });
   };
 
   const handleImageUpload = async (result: any) => {
-    if(result.event === 'success') {
+    if (result.event === "success") {
       setImageUrl(result.info.secure_url);
       setPublicImageId(result.info.public_id);
     }
   };
 
   const handleImageDelete = async () => {
-
     if (imageUrl) {
-      const deleteResult = await deleteImage(publicImageId);
-      
-      if (deleteResult.success) {
-        setImageUrl(null);
-        form.setValue('image', '');
-      } else {
-        console.error('Delete failed:', deleteResult.error);
-      }
+
+      startTransition(() => {
+        deleteImage(publicImageId)
+        .then(data => {
+          if(data.error) {
+              toast(data.error);
+          }
+          if(data.success) {
+            setImageUrl(null);
+            form.setValue("image", "");
+            toast(data.success);
+          }
+        })
+      })
     }
   };
 
@@ -92,7 +110,6 @@ function QuizzAdminForm() {
         <RoleGate allowedRole="ADMIN">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              
               {/*** Titre du quiz */}
               <FormField
                 control={form.control}
@@ -101,7 +118,7 @@ function QuizzAdminForm() {
                   <FormItem>
                     <FormLabel>Titre du Quiz</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} disabled={isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -116,13 +133,13 @@ function QuizzAdminForm() {
                   <FormItem>
                     <FormLabel>Description du Quiz</FormLabel>
                     <FormControl>
-                      <Textarea {...field} />
+                      <Textarea {...field} disabled={isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-                
+
               {/*** Image du quiz */}
               <FormField
                 control={form.control}
@@ -136,17 +153,30 @@ function QuizzAdminForm() {
                         uploadPreset="aaospnok"
                         onSuccess={handleImageUpload}
                       />
-                    </FormControl>  
+                    </FormControl>
                     {imageUrl && (
-                      <div>
-                        <img src={imageUrl} alt="Quiz" className="mt-2 max-w-xs" />
-                        <Button 
-                          onClick={handleImageDelete} 
-                          className="mt-2" 
+                      <div className="h-300 flex justify-between p-3 border border-[#eeeeee]">
+                        <Image
+                          src={imageUrl}
+                          width="500"
+                          height="300"
+                          style={{objectFit:"cover"}}
+                          className="mt-2 max-w-xs"
+                          alt=""
+                        />
+                        <Button
+                          onClick={handleImageDelete}
+                          className={isPending ? 'pointer-events-none opacity-50' : 'mt-2'}
                           variant="destructive"
                           type="button"
-                          >
-                          Supprimer l'image
+                          size="icon"
+                        >
+                          {isPending && (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          )}
+                          {!isPending && (
+                            <Trash2Icon className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     )}
@@ -159,11 +189,18 @@ function QuizzAdminForm() {
                 <Button
                   variant="link"
                   type="button"
+                  className={isPending ? 'pointer-events-none opacity-50'  :''}
                   onClick={() => form.reset()}
                 >
                   Reset
                 </Button>
-                <Button variant="success" type="submit">
+                <Button disabled={isPending} variant="success" type="submit">
+                  {isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {!isPending && (
+                    <Check className="mr-2 h-4 w-4" />
+                  )}
                   Créer le Quiz
                 </Button>
               </div>
