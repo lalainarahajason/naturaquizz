@@ -7,6 +7,7 @@ import { quizSchema, QuizFormValues } from '@/schemas/quiz';
 import { auth } from '@/auth';
 
 import * as z from "zod";
+import { Quiz } from '@prisma/client';
 
 export const createQuiz  = async ( data: QuizFormValues ) => {
 
@@ -49,6 +50,67 @@ export const createQuiz  = async ( data: QuizFormValues ) => {
         }
     }
 
-    
+}
 
+export const getQuizById = async (id: string): Promise<Quiz|null> => {
+
+    if(!id) return null;
+
+    try {
+
+        const quiz = await db.quiz.findUnique({
+            where: { id }
+        });
+
+        if(!quiz) return null;
+    
+        return quiz;
+
+    } catch (error) {
+        return null
+    }
+
+    
+}
+
+export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : Promise<{error?:string, success?:string, quiz?:QuizFormValues}> => {
+
+    if(!isAdmin() || !initialData) {
+        // if user is not admin abort
+        return {
+            error: "Vous n'avez pas le droit de faire cette action"
+        }
+    }
+
+    const {id} = initialData;
+
+    // check if quiz exists
+    const quiz = await db.quiz.findFirst({
+        where:{ id }
+    })
+
+    if(!quiz) {
+        return {
+            error: "Quiz non trouvé"
+        }
+    }
+
+    // update quiz
+    const updatedQuiz = await db.quiz.update({
+        where: { id },
+        data: {
+            title: data.title,
+            description: data.description,
+            image: data.image as string
+        }
+    });
+
+    return {
+        success: "quiz mis à jours avec succès"
+    }
+}
+
+const isAdmin = async () => {
+    const session = await auth();
+    return !session || session.user.role !== 'ADMIN';
 }

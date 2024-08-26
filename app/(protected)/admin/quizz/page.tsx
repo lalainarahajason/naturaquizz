@@ -6,11 +6,11 @@ import QuizzAdminForm from "@/components/quizz/quizz-admin-form";
 async function Quizz() {
 
     const user = await CurrentUser();
-    const isPremium = user?.role === 'ADMIN';
+    const isAdmin = user?.role === 'ADMIN';
 
     return (
         <>
-            {isPremium && <QuizzAdminForm />}
+            {isAdmin && <QuizzAdminForm mode="create" />}
         </>
 
     )

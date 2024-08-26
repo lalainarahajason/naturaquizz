@@ -15,3 +15,10 @@ export function slugify(title: string) {
     .replace(/ /g, "-")
     .replace(/[^\w-]+/g, "")
 }
+
+export function getPublicIdFromUrl(url:string) {
+
+  // get publicId of cloudflare media url without the extension
+  return url.split("/").pop()?.split(".")[0] as string;
+
+}
