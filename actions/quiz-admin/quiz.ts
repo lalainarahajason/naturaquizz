@@ -110,6 +110,45 @@ export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : 
     }
 }
 
+/**
+ * Delete a quiz by id
+ * @param id, quiz id
+ * @returns 
+ */
+export const deleteQuiz = async (id: string):Promise<{success?:string, error?:string} > => {
+    
+        if(!isAdmin()) {
+            // if user is not admin abort
+            return {
+                error: "Vous n'avez pas le droit de faire cette action"
+            }
+        }
+    
+        // delete quiz
+        await db.quiz.delete({
+            where: { id }
+        });
+    
+        return {
+            success: "Quiz supprimé avec succès"
+        }
+}
+
+/**
+ * Get all quiz
+ * @returns 
+ */
+export const getQuizs = async() => {
+
+    // Get all quiz
+    const quizs = await db.quiz.findMany({
+        orderBy:{
+            createdAt: 'desc'
+        }
+    });
+    return quizs
+}
+
 const isAdmin = async () => {
     const session = await auth();
     return !session || session.user.role !== 'ADMIN';

@@ -7,7 +7,8 @@ import {
     SquarePen,
     LayoutGrid,
     LucideIcon,
-    Plus
+    AppWindow,
+    Blocks
   } from "lucide-react";
   
   type Submenu = {
@@ -112,7 +113,7 @@ import {
             href: "/admin",
             label: "Dashboard",
             active: pathname.includes("/dashboard"),
-            icon: LayoutGrid,
+            icon: AppWindow,
             submenus: []
           }
         ]
@@ -121,12 +122,20 @@ import {
         groupLabel: "Quizz",
         menus: [
           {
-            href: "/admin/quizz",
+            href: "/admin/quiz/liste",
+            label: "Tous les quiz",
+            active: pathname.includes("/users"),
+            icon: LayoutGrid,
+            submenus: []
+          },
+          {
+            href: "/admin/quiz",
             label: "Ajouter",
             active: pathname.includes("/users"),
-            icon: Plus,
+            icon: Blocks,
             submenus: []
           }
+          
         ]
       },
       {
