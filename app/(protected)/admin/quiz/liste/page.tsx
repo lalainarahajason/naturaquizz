@@ -1,10 +1,12 @@
 "use client";
 
-import { getQuizs } from "@/actions/quiz-admin/quiz";
+import { deleteQuiz, getQuizById, getQuizs } from "@/actions/quiz-admin/quiz";
 import { Quiz } from "@prisma/client";
 import { useState, useEffect, useTransition } from "react";
 
 import Loading from "@/components/loading";
+
+import { toast } from "sonner";
 
 import {
   Table,
@@ -21,10 +23,12 @@ import moment from "moment";
 import Link from "next/link";
 
 import { Trash2, Edit, LayoutGrid } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function ListeQuiz() {
   const [quizs, setQuizs] = useState<Quiz[] | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
+  const [isPendingDeleted, startDeleteTransition] = useTransition()
 
   useEffect(() => {
     startTransition(() => {
@@ -38,6 +42,26 @@ function ListeQuiz() {
         });
     });
   }, []);
+
+  const handleDeleteQuiz = async (id: string) => {
+
+    if(quizs) {
+
+      startDeleteTransition(() => {
+        deleteQuiz(id)
+        .then(response => {
+          if(response.error) {
+            toast(response.error);
+          } else {
+            const newQuizs = [...quizs];
+            const filteredQuizs = newQuizs.filter((quiz) => quiz.id !== id);
+            setQuizs(filteredQuizs);
+            toast(response.success);
+          }
+        })
+      })
+    }
+  }
 
   return (
 
@@ -60,7 +84,7 @@ function ListeQuiz() {
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody >
               {quizs.map((quiz, index) => {
                 return (
                   <TableRow key={index}>
@@ -82,9 +106,9 @@ function ListeQuiz() {
                         <Link href={`/admin/quiz/${quiz.id}`}>
                           <Edit className="cursor-pointer" />
                         </Link>
-                        <Link href={`/admin/quiz/${quiz.id}`}>
+                        <Button variant="link" onClick={() => handleDeleteQuiz(quiz.id)}>
                           <Trash2 className="cursor-pointer text-red-600" />
-                        </Link>
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

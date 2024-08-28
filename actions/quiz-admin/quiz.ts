@@ -111,6 +111,30 @@ export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : 
 }
 
 /**
+ * Delete a quiz by id
+ * @param id, quiz id
+ * @returns 
+ */
+export const deleteQuiz = async (id: string):Promise<{success?:string, error?:string} > => {
+    
+        if(!isAdmin()) {
+            // if user is not admin abort
+            return {
+                error: "Vous n'avez pas le droit de faire cette action"
+            }
+        }
+    
+        // delete quiz
+        await db.quiz.delete({
+            where: { id }
+        });
+    
+        return {
+            success: "Quiz supprimé avec succès"
+        }
+}
+
+/**
  * Get all quiz
  * @returns 
  */
