@@ -32,8 +32,6 @@ import {
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-import { FormError } from "@/components/form-error";
-
 import { Check, Trash2Icon, Loader2 } from "lucide-react";
 import { Quiz } from "@prisma/client";
 import Link from "next/link";
