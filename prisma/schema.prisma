@@ -91,15 +91,17 @@ model TwoFactorConfirmation {
 
 // Quiz
 model Quiz {
+  
   id          String     @id @default(cuid())
   title       String
   slug        String     @unique
   description String
   image       String?
-  questions Question[]
+  questions   Question[]
   
   author      User       @relation(fields: [authorId], references: [id])
   authorId    String
+
   userQuizResults UserQuizResult[]
 
   createdAt   DateTime   @default(now())

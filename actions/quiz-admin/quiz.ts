@@ -110,6 +110,21 @@ export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : 
     }
 }
 
+/**
+ * Get all quiz
+ * @returns 
+ */
+export const getQuizs = async() => {
+
+    // Get all quiz
+    const quizs = await db.quiz.findMany({
+        orderBy:{
+            createdAt: 'desc'
+        }
+    });
+    return quizs
+}
+
 const isAdmin = async () => {
     const session = await auth();
     return !session || session.user.role !== 'ADMIN';

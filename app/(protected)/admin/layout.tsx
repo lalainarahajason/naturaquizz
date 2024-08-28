@@ -1,13 +1,14 @@
-
 import AdminSidebar from "@/components/sidebar";
+import Loading from "@/components/loading";
+import { Suspense } from "react";
 
-function layout({ children } : { children: React.ReactNode }) {
+function layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-white">
-        <AdminSidebar />
-        {children}
+    <div className="bg-white w-[680px]">
+      <AdminSidebar />
+      <Suspense fallback={<Loading />}>{children}</Suspense>
     </div>
-  )
+  );
 }
 
-export default layout
+export default layout;
