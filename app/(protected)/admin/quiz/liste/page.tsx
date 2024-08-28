@@ -61,9 +61,6 @@ const setRowRef = useCallback((id: string) => (el: HTMLTableRowElement | null) =
         row.style.pointerEvents = 'none';
       }
 
-
-
-
       if(quizs) {
         deleteQuiz(id)
           .then(response => {
