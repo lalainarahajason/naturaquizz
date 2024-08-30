@@ -26,7 +26,7 @@ export const quizSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   description: z.string().min(1, "La description est requise"),
   slug: z.string().optional(),
-  image: z.string().optional(),
+  image: z.string().optional()
 });
 
 export type QuizFormValues = z.infer<typeof quizSchema>;

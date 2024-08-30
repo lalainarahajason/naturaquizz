@@ -230,55 +230,55 @@ function QuizzAdminForm({
                     {!initialData ? "Créer le Quiz" : "Mettre à jour"}
                   </Button>
                 </div>
-                <div>
+                <div className="grid gap-4">
                   {/*** Image du quiz */}
-                  <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Image</FormLabel>
-                        <FormControl>
-                          <CldUploadButton
-                            className="bg-primary text-white rounded-md text-xs px-4 py-2 ml-4"
-                            uploadPreset="aaospnok"
-                            onSuccess={handleImageUpload}
-                          />
-                        </FormControl>
-                        {imageUrl && (
-                          <div className="flex flex-col gap-4">
-                            <div className="w-full h-[200px] grid relative">
-                              <Image
-                                src={imageUrl}
-                                fill={true}
-                                style={{ objectFit: "cover" }}
-                                className="mt-2 max-w-xs"
-                                alt=""
-                                priority={false}
-                              />
-                            </div>
-                            <Button
-                              onClick={handleImageDelete}
-                              className={
-                                isPending
-                                  ? "pointer-events-none opacity-50"
-                                  : "mt-2"
-                              }
-                              variant="destructive"
-                              type="button"
-                              size="icon"
-                            >
-                              {isPending && (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              )}
-                              {!isPending && <Trash2Icon className="h-4" />}
-                            </Button>
-                          </div>
+                  {imageUrl && (
+                    <div className="flex flex-col gap-4">
+                      <div className="w-full h-[200px] grid relative">
+                        <Image
+                          src={imageUrl}
+                          fill={true}
+                          style={{ objectFit: "cover" }}
+                          className="mt-2 max-w-xs w-full"
+                          alt=""
+                          priority={false}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <FormMessage />
+                  <div className="flex justify-between items-center">
+                    <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Image</FormLabel>
+                          <FormControl>
+                            <CldUploadButton
+                              className="bg-primary text-white rounded-md text-xs px-4 py-2 ml-4"
+                              uploadPreset="aaospnok"
+                              onSuccess={handleImageUpload}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                        onClick={handleImageDelete}
+                        className={
+                          isPending ? "pointer-events-none opacity-50" : "mt-2"
+                        }
+                        variant="destructive"
+                        type="button"
+                        size="icon"
+                      >
+                        {isPending && (
+                          <Loader2 className="h-4 w-4 animate-spin" />
                         )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        {!isPending && <Trash2Icon className="h-4" />}
+                      </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
