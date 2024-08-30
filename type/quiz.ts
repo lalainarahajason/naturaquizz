@@ -10,6 +10,7 @@ export type AdminSidebarEditProps = {
     handleImageUpload: (result: any) => Promise<void>;
     handleImageDelete: () => Promise<void>;
     onSubmit: (data: QuizFormValues) => Promise<void>;
+
 }
 
 export type QuestionSidebarEditProps = {
@@ -20,6 +21,7 @@ export type QuestionSidebarEditProps = {
     handleImageUpload: (result: any) => Promise<void>;
     handleImageDelete: () => Promise<void>;
     onSubmit: (data: QuestionFormValues) => Promise<void>;
+    selectedQuiz?: string
 }
 
 export type InitialDataQuestionProps = {

@@ -3,11 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { CurrentUser } from "@/lib/auth";
 import { db } from '@/lib/db';
-import { quizSchema, QuizFormValues } from '@/schemas/quiz';
+import { quizSchema, QuizFormValues, questionSchema, QuestionFormValues } from '@/schemas/quiz';
 import { auth } from '@/auth';
 
 import * as z from "zod";
 import { Quiz } from '@prisma/client';
+import { form } from '@/translations/strings';
 
 export const createQuiz  = async ( data: QuizFormValues ) => {
 
@@ -69,20 +70,20 @@ export const getQuizById = async (id: string): Promise<Quiz|null> => {
     } catch (error) {
         return null
     }
-
-    
 }
 
-export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : Promise<{error?:string, success?:string, quiz?:QuizFormValues}> => {
+export const updateQuiz = async (formData:QuizFormValues, initialData?:Quiz|null) : Promise<{error?:string, success?:string, quiz?:QuizFormValues}> => {
 
-    if(!isAdmin() || !initialData) {
+    if(!isAdmin()) {
         // if user is not admin abort
         return {
             error: "Vous n'avez pas le droit de faire cette action"
         }
     }
 
-    const {id} = initialData;
+    const {id} = initialData ? initialData : formData;
+
+    console.log("id", id)
 
     // check if quiz exists
     const quiz = await db.quiz.findFirst({
@@ -95,15 +96,48 @@ export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : 
         }
     }
 
+    console.log("udate new quiz")
+
     // update quiz
     const updatedQuiz = await db.quiz.update({
         where: { id },
         data: {
-            title: data.title,
-            description: data.description,
-            image: data.image as string
+            title: formData.title,
+            description: formData.description,
+            image: formData.image as string,
         }
     });
+
+    console.log(formData)
+
+    // update questions
+    if(formData.questions) {
+
+        console.log("create new question")
+
+        await db.question.deleteMany({
+            where: { quizId: id }
+        })
+
+        // update a question of the quiz
+        const createQuestion = await db.question.create({
+            data:{
+                question: formData.title,
+                quizId: formData.id as string,
+                answers: {
+                   create: formData.questions?.map(question => {
+                          return {
+                            text: question.question,
+                            isCorrect: question.answers[0].isCorrect,
+                            order: question.answers[0].order
+                          }
+                   })
+                }
+            }
+        })
+
+        console.log(createQuestion)
+    }
 
     return {
         success: "quiz mis à jours avec succès"
@@ -138,14 +172,22 @@ export const deleteQuiz = async (id: string):Promise<{success?:string, error?:st
  * Get all quiz
  * @returns 
  */
-export const getQuizs = async() => {
+export const getQuizs = async(): Promise<Quiz[]> => {
 
     // Get all quiz
     const quizs = await db.quiz.findMany({
+        select:{
+            id: true,
+            title: true,
+            description: true,
+            image: true,
+            questions:true
+        },
         orderBy:{
             createdAt: 'desc'
         }
     });
+
     return quizs
 }
 

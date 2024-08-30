@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 
-import { QuestionFormValues } from "@/schemas/quiz";
+import { QuestionFormValues, QuizFormValues } from "@/schemas/quiz";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,9 @@ import QuestionSidebar from "@/components/quizz/question-admin-sidebar";
 
 import { InitialDataQuestionProps } from "@/type/quiz";
 import { Quiz } from "@prisma/client";
-import { getQuizs } from "@/actions/quiz-admin/quiz";
+import { getQuizs, updateQuiz } from "@/actions/quiz-admin/quiz";
+
+import { toast } from "sonner";
 
 function AddQuestion({
   initialData,
@@ -51,7 +53,8 @@ function AddQuestion({
 
   const [publicImageId, setPublicImageId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const [quizsList, setQuizsList] = useState<Quiz[]>([]);
+  const [quizsList, setQuizsList] = useState<QuizFormValues[]>([]);
+  const [selectedQuiz, setSelectedQuiz] = useState<string>("");
 
   const form = useForm<QuestionFormValues>({
     defaultValues: {
@@ -94,8 +97,40 @@ function AddQuestion({
 
   const handleImageDelete = async () => {};
 
-  const onSubmit = async (data:QuestionFormValues) => {
-    console.log(data)
+  const onSubmit = async (data:QuestionFormValues):Promise<void> => {
+
+    startTransition(() => {
+        // update question of a quiz
+        const updatedQuiz = quizsList.find((quiz) => quiz.id === data.quizId);
+
+        console.log(updatedQuiz)
+
+        if (updatedQuiz) {
+
+          updatedQuiz?.questions?.push({
+            question: data.question,
+            timer: data.timer,
+            quizId:"",
+            image: "",
+            answers: data.answers,
+          });
+          
+          console.log("===")
+          console.log(updatedQuiz)
+
+          updateQuiz(updatedQuiz)
+          .then(result => {
+            if(result.success) {
+              form.reset();
+              setImageUrl(null);
+              toast(result.success)
+            } else {
+              toast(result.error as string)
+            }
+          })
+        }
+    })
+
   };
 
   useEffect(() => {
@@ -105,7 +140,7 @@ function AddQuestion({
     getQuizs()
       .then((result) => {
         if (result) {
-          setQuizsList(result);
+          setQuizsList(result as QuizFormValues[]);
         }
       })
       .catch((error) => {
@@ -122,7 +157,8 @@ function AddQuestion({
         >
           <Card className="w-full lg:w-[600px]">
             <CardHeader className="uppercase text-center font-bold">
-              Ajouter une question
+              Ajouter une question 
+              
             </CardHeader>
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
@@ -132,7 +168,16 @@ function AddQuestion({
                   name="quizId"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select 
+                        onValueChange={(value)=> {
+                          field.onChange(value)
+                          setSelectedQuiz(() => {
+                            return quizsList.find(quiz => quiz.id === value)?.title || ""
+                          })
+                          
+                        }} 
+                        defaultValue={field.value}>
+
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Choisir un quiz" />
                         </SelectTrigger>
@@ -140,7 +185,7 @@ function AddQuestion({
                           <SelectGroup>
                             <SelectLabel>Quizs</SelectLabel>
                             {quizsList.map((quiz) => (
-                              <SelectItem key={quiz.id} value={quiz.id}>
+                              <SelectItem key={quiz.id} value={quiz.id as string}>
                                 {quiz.title}
                               </SelectItem>
                             ))}
@@ -168,7 +213,7 @@ function AddQuestion({
               />
 
               {/** Answers */}
-              <FormLabel>Answers</FormLabel>
+              <FormLabel>Réponses</FormLabel>
               {answers.map((answer, index) => (
                 <div
                   key={answer.id}
@@ -220,7 +265,7 @@ function AddQuestion({
                   onClick={handleAddAnswer}
                 >
                   <PlusCircleIcon />
-                  Add Answer
+                  Ajouter une réponse
                 </Button>
               </div>
             </CardContent>
@@ -234,6 +279,7 @@ function AddQuestion({
             handleImageUpload={handleImageUpload}
             handleImageDelete={handleImageDelete}
             onSubmit={onSubmit}
+            selectedQuiz={selectedQuiz}
           />
         </form>
       </Form>

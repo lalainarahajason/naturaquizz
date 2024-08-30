@@ -28,10 +28,18 @@ const QuestionSidebar = ({
   handleImageUpload,
   handleImageDelete,
   onSubmit,
+  selectedQuiz,
 }: QuestionSidebarEditProps) => {
   return (
     <Card className="w-full lg:w-[380px]">
-      <CardHeader className="border-b">Publier</CardHeader>
+      <CardHeader className="border-b">
+        <div className="flex justify-between">
+          Publier{" "}
+          {selectedQuiz && (
+            <span className="text-sm text-gray-400">{selectedQuiz}</span>
+          )}
+        </div>
+      </CardHeader>
       <CardContent className="grid gap-8">
         <div className="grid gap-4 mt-4">
           {imageUrl && (

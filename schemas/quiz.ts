@@ -17,11 +17,12 @@ export const questionSchema = z.object({
 
 
 export const quizSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Le titre est requis"),
   description: z.string().min(1, "La description est requise"),
   slug: z.string().optional(),
   image: z.string().optional(),
-  //questions: z.array(questionSchema)
+  questions: z.array(questionSchema).optional()
 });
 
 export type QuizFormValues = z.infer<typeof quizSchema>;
