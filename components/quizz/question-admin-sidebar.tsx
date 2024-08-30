@@ -2,7 +2,12 @@ import { Button } from "@/components/ui/button";
 import { CldUploadButton } from "next-cloudinary";
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Check, Trash2Icon, Loader2 } from "lucide-react";
 
 import {
@@ -13,9 +18,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import {AdminSidebarEditProps} from "@/type/quiz"
+import { QuestionSidebarEditProps } from "@/type/quiz";
 
-const Sidebar = ({
+const QuestionSidebar = ({
   form,
   imageUrl,
   isPending,
@@ -23,13 +28,12 @@ const Sidebar = ({
   handleImageUpload,
   handleImageDelete,
   onSubmit,
-}: AdminSidebarEditProps ) => {
+}: QuestionSidebarEditProps) => {
   return (
     <Card className="w-full lg:w-[380px]">
       <CardHeader className="border-b">Publier</CardHeader>
-      <CardContent>
-        
-        <div className="grid gap-4">
+      <CardContent className="grid gap-8">
+        <div className="grid gap-4 mt-4">
           {imageUrl && (
             <div className="flex flex-col gap-4">
               <div className="w-full h-[200px] grid relative">
@@ -64,22 +68,21 @@ const Sidebar = ({
             />
             {imageUrl && (
               <Button
-              onClick={handleImageDelete}
-              className={isPending ? "pointer-events-none opacity-50" : "mt-2"}
-              variant="destructive"
-              type="button"
-              size="icon"
-            >
-              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {!isPending && <Trash2Icon className="h-4" />}
-            </Button>
+                onClick={handleImageDelete}
+                className={
+                  isPending ? "pointer-events-none opacity-50" : "mt-2"
+                }
+                variant="destructive"
+                type="button"
+                size="icon"
+              >
+                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {!isPending && <Trash2Icon className="h-4" />}
+              </Button>
             )}
-            
           </div>
         </div>
       </CardContent>
-
-      {/** Footer */}
       <CardFooter className="border-t pt-6">
         <div className="grid grid-flow-col gap-4">
           <Button
@@ -105,4 +108,4 @@ const Sidebar = ({
   );
 };
 
-export default Sidebar;
+export default QuestionSidebar;

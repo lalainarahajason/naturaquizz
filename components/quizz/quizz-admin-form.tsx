@@ -1,21 +1,16 @@
 "use client";
 
-import { useForm, useFieldArray, Control } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { useEffect, useState, useTransition } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { quizSchema, QuizFormValues } from "@/schemas/quiz";
 
 import { RoleGate } from "@/components/auth/role-gate";
 import { createQuiz, getQuizById, updateQuiz } from "@/actions/quiz-admin/quiz";
-
 import { deleteImage } from "@/actions/quiz-admin/image";
-import { CldUploadButton } from "next-cloudinary";
-import Image from "next/image";
-
-import { useEffect, useState, useTransition } from "react";
 
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,9 +27,7 @@ import {
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-import { Check, Trash2Icon, Loader2 } from "lucide-react";
 import { Quiz } from "@prisma/client";
-import Link from "next/link";
 
 import Sidebar from "./quiz-admin-sidebar";
 
