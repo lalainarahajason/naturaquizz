@@ -8,7 +8,8 @@ import {
     LayoutGrid,
     LucideIcon,
     AppWindow,
-    Blocks
+    Blocks,
+    MessageCircleQuestionIcon,
   } from "lucide-react";
   
   type Submenu = {
@@ -124,15 +125,22 @@ import {
           {
             href: "/admin/quiz/liste",
             label: "Tous les quiz",
-            active: pathname.includes("/users"),
+            active: pathname.includes("/quiz/liste"),
             icon: LayoutGrid,
             submenus: []
           },
           {
-            href: "/admin/quiz",
+            href: "/admin/quiz/add",
             label: "Ajouter",
-            active: pathname.includes("/users"),
+            active: pathname.includes("/quiz/add"),
             icon: Blocks,
+            submenus: []
+          },
+          {
+            href: "/admin/quiz/questions",
+            label: "Questions",
+            active: pathname.includes("/quiz/questions"),
+            icon: MessageCircleQuestionIcon,
             submenus: []
           }
           
@@ -151,14 +159,14 @@ import {
           {
             href: "/informations",
             label: "Informations",
-            active: pathname.includes("/account"),
+            active: pathname.includes("/informations"),
             icon: Settings,
             submenus: []
           },
           {
             href: "/settings",
             label: "Account",
-            active: pathname.includes("/account"),
+            active: pathname.includes("/settings"),
             icon: Edit3Icon,
             submenus: []
           }
