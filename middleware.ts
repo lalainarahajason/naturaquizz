@@ -8,10 +8,11 @@ import {
     authRoutes,
     apiAuthPrefix
 } from "@/routes"
+import { getUserByEmail } from "./data/user";
 
 const { auth } = NextAuth(authConfig)
 
-export default auth((req) => {
+export default auth(async(req) => {
 
     const isLoggedIn = !!req.auth
     const { nextUrl } = req
@@ -29,6 +30,24 @@ export default auth((req) => {
             return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
         }
         return;
+    }
+
+    if(isLoggedIn) {
+        try {
+            // Check if the user still exists in the database
+            const user = await getUserByEmail(req.auth?.user?.email as string);
+            console.log("user exists", req.auth?.user?.email);
+            console.log(user);
+            if (!user) {
+                // User doesn't exist in the database, force logout
+                // return Response.redirect(new URL("/api/auth/signout", nextUrl))
+            }
+        } catch (error) {
+            console.error("Error checking user existence:", error);
+            // Optionally, you can decide to log out the user on error or allow them to continue
+            // For safety, let's log them out
+            //return Response.redirect(new URL("/api/auth/signout", nextUrl))
+        }
     }
 
     if(!isLoggedIn && !isPublicRoute) {

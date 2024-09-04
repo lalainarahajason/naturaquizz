@@ -14,16 +14,18 @@ export const createQuiz  = async ( data: QuizFormValues ) => {
 
     const session = await auth();
     
-    // if user is not admin abort
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!isAdmin()) {
+        // if user is not admin abort
         return {
             error: "Vous n'avez pas le droit de faire cette action"
-        }
+        };
     }
 
     try {
 
         const validateData = quizSchema.safeParse(data);
+
+        console.log(validateData.success)
 
         if (!validateData.success) {
             return {
@@ -37,7 +39,7 @@ export const createQuiz  = async ( data: QuizFormValues ) => {
               slug: data.title, // Ajout d'un slug par défaut s'il est optionnel
               description: data.description,
               image: data.image,
-              author: { connect: { id: session.user.id } }, // Ajout de l'auteur si nécessaire
+              author: { connect: { id: session?.user.id } }, // Ajout de l'auteur si nécessaire
             }
         });
 
@@ -47,7 +49,7 @@ export const createQuiz  = async ( data: QuizFormValues ) => {
           
     } catch (error) {
         return {
-            error : "Erreur inattendue"
+            error : (error as Error).message
         }
     }
 
@@ -72,18 +74,15 @@ export const getQuizById = async (id: string): Promise<Quiz|null> => {
     }
 }
 
-export const updateQuiz = async (formData:QuizFormValues, initialData?:Quiz|null) : Promise<{error?:string, success?:string, quiz?:QuizFormValues}> => {
-
-    if(!isAdmin()) {
+export const updateQuiz = async (formData: QuizFormValues, initialData?: Quiz | null): Promise<{ error?: string; success?: string; quiz?: QuizFormValues }> => {
+    if (!isAdmin()) {
         // if user is not admin abort
         return {
             error: "Vous n'avez pas le droit de faire cette action"
-        }
+        };
     }
 
-    const {id} = initialData ? initialData : formData;
-
-    console.log("id", id)
+    const { id } = initialData ? initialData : formData;
 
     // check if quiz exists
     const quiz = await db.quiz.findFirst({
@@ -96,54 +95,19 @@ export const updateQuiz = async (formData:QuizFormValues, initialData?:Quiz|null
         }
     }
 
-    console.log("udate new quiz")
-
     // update quiz
-    const updatedQuiz = await db.quiz.update({
+    const { questions, ...quizData } = formData;
+    
+    // Update the quiz
+    await db.quiz.update({
         where: { id },
-        data: {
-            title: formData.title,
-            description: formData.description,
-            image: formData.image as string,
-        }
+        data: quizData
     });
 
-    console.log(formData)
-
-    // update questions
-    if(formData.questions) {
-
-        console.log("create new question")
-
-        await db.question.deleteMany({
-            where: { quizId: id }
-        })
-
-        // update a question of the quiz
-        const createQuestion = await db.question.create({
-            data:{
-                question: formData.title,
-                quizId: formData.id as string,
-                answers: {
-                   create: formData.questions?.map(question => {
-                          return {
-                            text: question.question,
-                            isCorrect: question.answers[0].isCorrect,
-                            order: question.answers[0].order
-                          }
-                   })
-                }
-            }
-        })
-
-        console.log(createQuestion)
-    }
-
     return {
-        success: "quiz mis à jours avec succès"
-    }
+        success: "quiz mis à jour avec succès"
+    };
 }
-
 /**
  * Delete a quiz by id
  * @param id, quiz id
@@ -179,9 +143,29 @@ export const getQuizs = async(): Promise<Quiz[]> => {
         select:{
             id: true,
             title: true,
+            slug: true,
             description: true,
             image: true,
-            questions:true
+            authorId: true,
+            createdAt: true,
+            updatedAt: true,
+            questions: {
+                select:{
+                    id: true,
+                    question: true,
+                    image: true,
+                    timer: true,
+                    quizId:true,
+                    answers: {
+                        select:{
+                            id: true,
+                            text: true,
+                            isCorrect: true,
+                            order: true
+                        }
+                    }
+                }
+            }
         },
         orderBy:{
             createdAt: 'desc'
@@ -191,7 +175,8 @@ export const getQuizs = async(): Promise<Quiz[]> => {
     return quizs
 }
 
-const isAdmin = async () => {
+
+export const isAdmin = async () => {
     const session = await auth();
     return !session || session.user.role !== 'ADMIN';
-}
+  }

@@ -1,5 +1,6 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { auth } from '@/auth';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -22,3 +23,5 @@ export function getPublicIdFromUrl(url:string) {
   return url.split("/").pop()?.split(".")[0] as string;
 
 }
+
+

@@ -25,6 +25,7 @@ export type QuestionSidebarEditProps = {
 }
 
 export type InitialDataQuestionProps = {
+    quizId?: string;
     question?: string;
     image?: string;
     timer?: number;
@@ -33,5 +34,4 @@ export type InitialDataQuestionProps = {
       isCorrect: boolean;
       order: number;
     }[];
-    quizId?: string;
 };
