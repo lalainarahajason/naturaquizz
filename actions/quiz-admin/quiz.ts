@@ -3,26 +3,29 @@
 import { revalidatePath } from 'next/cache'
 import { CurrentUser } from "@/lib/auth";
 import { db } from '@/lib/db';
-import { quizSchema, QuizFormValues } from '@/schemas/quiz';
+import { quizSchema, QuizFormValues, questionSchema, QuestionFormValues } from '@/schemas/quiz';
 import { auth } from '@/auth';
 
 import * as z from "zod";
 import { Quiz } from '@prisma/client';
+import { form } from '@/translations/strings';
 
 export const createQuiz  = async ( data: QuizFormValues ) => {
 
     const session = await auth();
     
-    // if user is not admin abort
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!isAdmin()) {
+        // if user is not admin abort
         return {
             error: "Vous n'avez pas le droit de faire cette action"
-        }
+        };
     }
 
     try {
 
         const validateData = quizSchema.safeParse(data);
+
+        console.log(validateData.success)
 
         if (!validateData.success) {
             return {
@@ -36,7 +39,7 @@ export const createQuiz  = async ( data: QuizFormValues ) => {
               slug: data.title, // Ajout d'un slug par défaut s'il est optionnel
               description: data.description,
               image: data.image,
-              author: { connect: { id: session.user.id } }, // Ajout de l'auteur si nécessaire
+              author: { connect: { id: session?.user.id } }, // Ajout de l'auteur si nécessaire
             }
         });
 
@@ -46,7 +49,7 @@ export const createQuiz  = async ( data: QuizFormValues ) => {
           
     } catch (error) {
         return {
-            error : "Erreur inattendue"
+            error : (error as Error).message
         }
     }
 
@@ -69,20 +72,17 @@ export const getQuizById = async (id: string): Promise<Quiz|null> => {
     } catch (error) {
         return null
     }
-
-    
 }
 
-export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : Promise<{error?:string, success?:string, quiz?:QuizFormValues}> => {
-
-    if(!isAdmin() || !initialData) {
+export const updateQuiz = async (formData: QuizFormValues, initialData?: Quiz | null): Promise<{ error?: string; success?: string; quiz?: QuizFormValues }> => {
+    if (!isAdmin()) {
         // if user is not admin abort
         return {
             error: "Vous n'avez pas le droit de faire cette action"
-        }
+        };
     }
 
-    const {id} = initialData;
+    const { id } = initialData ? initialData : formData;
 
     // check if quiz exists
     const quiz = await db.quiz.findFirst({
@@ -96,20 +96,18 @@ export const updateQuiz = async (data:QuizFormValues, initialData?:Quiz|null) : 
     }
 
     // update quiz
-    const updatedQuiz = await db.quiz.update({
+    const { questions, ...quizData } = formData;
+    
+    // Update the quiz
+    await db.quiz.update({
         where: { id },
-        data: {
-            title: data.title,
-            description: data.description,
-            image: data.image as string
-        }
+        data: quizData
     });
 
     return {
-        success: "quiz mis à jours avec succès"
-    }
+        success: "quiz mis à jour avec succès"
+    };
 }
-
 /**
  * Delete a quiz by id
  * @param id, quiz id
@@ -138,18 +136,47 @@ export const deleteQuiz = async (id: string):Promise<{success?:string, error?:st
  * Get all quiz
  * @returns 
  */
-export const getQuizs = async() => {
+export const getQuizs = async(): Promise<Quiz[]> => {
 
     // Get all quiz
     const quizs = await db.quiz.findMany({
+        select:{
+            id: true,
+            title: true,
+            slug: true,
+            description: true,
+            image: true,
+            authorId: true,
+            createdAt: true,
+            updatedAt: true,
+            questions: {
+                select:{
+                    id: true,
+                    question: true,
+                    image: true,
+                    timer: true,
+                    quizId:true,
+                    answers: {
+                        select:{
+                            id: true,
+                            text: true,
+                            isCorrect: true,
+                            order: true
+                        }
+                    }
+                }
+            }
+        },
         orderBy:{
             createdAt: 'desc'
         }
     });
+
     return quizs
 }
 
-const isAdmin = async () => {
+
+export const isAdmin = async () => {
     const session = await auth();
     return !session || session.user.role !== 'ADMIN';
-}
+  }

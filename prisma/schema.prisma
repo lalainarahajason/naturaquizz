@@ -27,7 +27,7 @@ model User {
 
   // quiz
   quizzes       Quiz[]
-  quizResults   UserQuizResult[]
+  quizResults   UserQuizResult[] @relation("UserQuizResult")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -114,8 +114,8 @@ model Question {
   question String
   image    String?
   timer    Int      @default(60)
-  answers  Answer[]
-  quiz     Quiz     @relation(fields: [quizId], references: [id])
+  answers  Answer[] @relation("QuestionToAnswer")
+  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   quizId   String
 }
 
@@ -124,13 +124,13 @@ model Answer {
   text       String
   isCorrect  Boolean
   order      Int
-  question   Question @relation(fields: [questionId], references: [id])
+  question   Question @relation("QuestionToAnswer", fields: [questionId], references: [id], onDelete: Cascade)
   questionId String
 }
 
 model UserQuizResult {
   id             String   @id @default(cuid())
-  user           User     @relation(fields: [userId], references: [id])
+  user           User     @relation("UserQuizResult", fields: [userId], references: [id],  onDelete: Cascade)
   userId         String
   quiz           Quiz     @relation(fields: [quizId], references: [id])
   quizId         String

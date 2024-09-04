@@ -61,9 +61,6 @@ const setRowRef = useCallback((id: string) => (el: HTMLTableRowElement | null) =
         row.style.pointerEvents = 'none';
       }
 
-
-
-
       if(quizs) {
         deleteQuiz(id)
           .then(response => {
@@ -102,11 +99,8 @@ const setRowRef = useCallback((id: string) => (el: HTMLTableRowElement | null) =
       </h2>
 
       {isPending && <Loading />}
-
-      {quizs && (
         <>
           <Table>
-            {quizs.length === 0 && <TableCaption>Aucun quiz crée pour le moment</TableCaption>}
             <TableHeader>
               <TableRow>
                 <TableHead>Nom</TableHead>
@@ -115,7 +109,14 @@ const setRowRef = useCallback((id: string) => (el: HTMLTableRowElement | null) =
               </TableRow>
             </TableHeader>
             <TableBody >
-              {quizs.map((quiz, index) => {
+              {isPending && (
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <Loading />
+                  </TableCell>
+                </TableRow>
+              )}
+              {quizs && quizs.map((quiz, index) => {
                 return (
                   <TableRow key={index} ref={setRowRef(quiz.id)} >
                     <TableCell>
@@ -147,7 +148,6 @@ const setRowRef = useCallback((id: string) => (el: HTMLTableRowElement | null) =
             </TableBody>
           </Table>
         </>
-      )}
     </div>
   );
 }

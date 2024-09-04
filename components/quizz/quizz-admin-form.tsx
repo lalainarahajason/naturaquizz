@@ -1,21 +1,16 @@
 "use client";
 
-import { useForm, useFieldArray, Control } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { useEffect, useState, useTransition } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { quizSchema, QuizFormValues } from "@/schemas/quiz";
 
 import { RoleGate } from "@/components/auth/role-gate";
 import { createQuiz, getQuizById, updateQuiz } from "@/actions/quiz-admin/quiz";
-
 import { deleteImage } from "@/actions/quiz-admin/image";
-import { CldUploadButton } from "next-cloudinary";
-import Image from "next/image";
-
-import { useEffect, useState, useTransition } from "react";
 
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,9 +27,9 @@ import {
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-import { Check, Trash2Icon, Loader2 } from "lucide-react";
 import { Quiz } from "@prisma/client";
-import Link from "next/link";
+
+import Sidebar from "./quiz-admin-sidebar";
 
 type initialDataType = {
   title?: string;
@@ -142,138 +137,83 @@ function QuizzAdminForm({
   };
 
   return (
-    <Card className="w-[600px]">
-      <CardHeader className="uppercase text-center font-bold">
-        {!initialData ? (
-          <>Ajouter un quiz</>
-        ) : (
-          <>{`Éditer ${initialData.title} `}</>
-        )}
-      </CardHeader>
-      <CardContent>
-        <RoleGate allowedRole="ADMIN">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {/*** Titre du quiz */}
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Titre du Quiz</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isPending} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+    <>
+      <RoleGate allowedRole="ADMIN">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid grid-flow-row lg:grid-flow-col items-start gap-4"
+          >
+            <Card className="w-full lg:w-[600px]">
+              <CardHeader className="uppercase text-center font-bold">
+                {!initialData ? (
+                  <>Ajouter un quiz</>
+                ) : (
+                  <>{`Quiz :  ${initialData.title} `}</>
                 )}
-              />
-
-              {/*** Description du quiz */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description du Quiz</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} disabled={isPending} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/*** Image du quiz */}
-              <FormField
-                control={form.control}
-                name="image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Image du Quiz</FormLabel>
-                    <FormControl>
-                      <CldUploadButton
-                        className="bg-primary text-white rounded-md text-xs px-4 py-2 ml-4"
-                        uploadPreset="aaospnok"
-                        onSuccess={handleImageUpload}
-                      />
-                    </FormControl>
-                    {imageUrl && (
-                      <div className="h-300 flex justify-between p-3 border border-[#eeeeee]">
-                        <Image
-                          src={imageUrl}
-                          width="500"
-                          height="300"
-                          style={{ objectFit: "cover" }}
-                          className="mt-2 max-w-xs"
-                          alt=""
-                          priority={false}
-                        />
-                        <Button
-                          onClick={handleImageDelete}
-                          className={
-                            isPending
-                              ? "pointer-events-none opacity-50"
-                              : "mt-2"
-                          }
-                          variant="destructive"
-                          type="button"
-                          size="icon"
-                        >
-                          {isPending && (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          )}
-                          {!isPending && <Trash2Icon className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-between">
-                {!initialData && (
-                  <Button
-                    variant="link"
-                    type="button"
-                    className={
-                      isPending ? "pointer-events-none opacity-50" : ""
-                    }
-                    onClick={() => form.reset()}
-                  >
-                    Reset
-                  </Button>
-                )}
-
-                {initialData && (
-                  <Button
-                    variant="link"
-                    type="button"
-                    className={
-                      isPending ? "pointer-events-none opacity-50" : ""
-                    }
-                  >
-                    <Link href="#">
-                      Annuler
-                    </Link>
-                    
-                  </Button>
-                )}
-
-                <Button disabled={isPending} variant="success" type="submit">
-                  {isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              </CardHeader>
+              <CardContent className="space-y-8">
+                {/*** Titre du quiz */}
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Titre du Quiz</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={isPending} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  {!isPending && <Check className="mr-2 h-4 w-4" />}
-                  {!initialData ? "Créer le Quiz" : "Mettre à jour le quiz"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </RoleGate>
-      </CardContent>
-    </Card>
+                />
+
+                {/*** Description du quiz */}
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description du Quiz</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} disabled={isPending} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-between">
+                  {!initialData && (
+                    <Button
+                      variant="link"
+                      type="button"
+                      className={
+                        isPending ? "pointer-events-none opacity-50" : ""
+                      }
+                      onClick={() => form.reset()}
+                    >
+                      Reset
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/** Sidebar */}
+            <Sidebar
+              form={form}
+              imageUrl={imageUrl}
+              isPending={isPending}
+              initialData={initialData}
+              handleImageUpload={handleImageUpload}
+              handleImageDelete={handleImageDelete}
+              onSubmit={onSubmit}
+            />
+          </form>
+        </Form>
+      </RoleGate>
+    </>
   );
 }
 
