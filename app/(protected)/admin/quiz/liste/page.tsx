@@ -191,7 +191,7 @@ function ListeQuiz() {
                           </h1>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Link href={`/admin/question/liste?filterByQuiz=${encodeURIComponent(quiz.title)}`}><Badge>{questionsLength} question{questionsLength && questionsLength > 1 ? 's':''}</Badge></Link>
+                          <Link href={`/admin/question/liste?filterByQuiz=${encodeURIComponent(quiz.title)}`}><Badge>{questionsLength}</Badge></Link>
                         </TableCell>
                         <TableCell>{quiz.description}</TableCell>
                         <TableCell className="text-right">
