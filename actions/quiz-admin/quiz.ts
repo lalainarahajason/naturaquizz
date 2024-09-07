@@ -121,6 +121,17 @@ export const deleteQuiz = async (id: string):Promise<{success?:string, error?:st
                 error: "Vous n'avez pas le droit de faire cette action"
             }
         }
+
+        // if quiz exists
+        const quiz = await db.quiz.findFirst({
+            where: { id }
+        });
+
+        if(!quiz) {
+            return {
+                error: "Ce quiz n'existe pas"
+            }
+        }
     
         // delete quiz
         await db.quiz.delete({
@@ -136,7 +147,7 @@ export const deleteQuiz = async (id: string):Promise<{success?:string, error?:st
  * Get all quiz
  * @returns 
  */
-export const getQuizs = async(): Promise<Quiz[]> => {
+export const getQuizs = async(): Promise<QuizFormValues[]> => {
 
     // Get all quiz
     const quizs = await db.quiz.findMany({
@@ -172,7 +183,7 @@ export const getQuizs = async(): Promise<Quiz[]> => {
         }
     });
 
-    return quizs
+    return quizs as QuizFormValues[]; // Add type assertion
 }
 
 

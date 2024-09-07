@@ -10,6 +10,7 @@ import { FormError } from "@/components/form-error";
 
 import { Card, CardHeader, CardContent} from "@/components/ui/card";
 import QuestionAdminForm from "@/components/quizz/question-admin-form";
+import { QuestionFormValues } from "@/schemas/quiz";
 
 function QuestionEdit() {
 
@@ -17,7 +18,6 @@ function QuestionEdit() {
   const [error, setError] = useState<string|undefined>(undefined);
   const [question, setQuestion] = useState<Question|null>(null);
   
-
   return (
     <>
       {error ? (
@@ -33,7 +33,7 @@ function QuestionEdit() {
           </CardContent>
           
         </Card>
-      ) : <QuestionAdminForm initialData={null} mode="create" /> }
+      ) : <QuestionAdminForm mode="create" /> }
     </>
   )
 }

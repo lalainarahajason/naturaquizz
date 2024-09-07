@@ -137,7 +137,7 @@ import {
             submenus: []
           },
           {
-            href: "/admin/quiz/questions",
+            href: "/admin/question/liste",
             label: "Questions",
             active: pathname.includes("/quiz/questions"),
             icon: MessageCircleQuestionIcon,

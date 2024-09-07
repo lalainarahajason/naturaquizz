@@ -1,37 +1,167 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { QuestionFormValues } from "@/schemas/quiz";
+import { QuestionFormValues, QuestionWithAnswersUpdate } from "@/schemas/quiz";
 import { auth } from "@/auth";
+import { Question } from "@prisma/client";
+import { QuestionWithAnswers } from "@/schemas/quiz";
+import { getQuizById } from "./quiz";
 
 // Create a single question
-export const createQuestion = async (question:QuestionFormValues) => {
+export const createQuestion = async (question: QuestionFormValues) => {
+  if (!isAdmin()) {
+    // if user is not admin abort
+    return {
+      error: "Vous n'avez pas le droit de faire cette action",
+    };
+  }
 
-    if (!isAdmin()) {
-        // if user is not admin abort
-        return {
-            error: "Vous n'avez pas le droit de faire cette action"
-        };
-    }
+  const { answers, ...questionData } = question;
 
-    const {answers, ...questionData} = question;
+  // create new question
+  const newQuestion = await db.question.create({
+    data: questionData,
+  });
 
-    // create new question
-    const newQuestion = await db.question.create({
-        data: questionData
+  // create answer
+  await db.answer.createMany({
+    data: answers.map((answer, index) => ({
+      ...answer,
+      questionId: newQuestion.id,
+      order: index + 1,
+    })),
+  });
+
+  return {
+    success: "question created with success",
+  };
+};
+
+/**
+ * Get all questions
+ *
+ * This function retrieves all questions from the database, including their associated answers.
+ * It checks if the current user is an admin before executing the query.
+ * If the user is not an admin, it throws an error.
+ *
+ * @returns {Promise<Question[]|null>} - An array of questions, or an object with an error message if an error occurs.
+ */
+export const getQuestions = async (): Promise<Question[] | null> => {
+  if (!isAdmin) {
+    throw new Error("Action impossible");
+  }
+
+  const questions = await db.question.findMany({
+    select: {
+      id: true,
+      question: true,
+      image: true,
+      timer: true,
+      quizId: true,
+      answers: {
+        select: {
+          id: true,
+          text: true,
+          isCorrect: true,
+          order: true,
+        },
+      },
+    },
+  });
+
+  return questions;
+};
+
+/**
+ * Retrieves a question by its ID, including its associated answers.
+ *
+ * This function checks if the current user is an admin before executing the query.
+ * If the user is not an admin, it throws an error.
+ *
+ * @param questionId - The ID of the question to retrieve.
+ * @returns {Promise<QuestionWithAnswers|null>} - The question with the specified ID, or an object with an error message if an error occurs.
+ */
+export const getQuestionById = async (questionId: string) => {
+  if (!isAdmin) {
+    throw new Error("Action impossible");
+  }
+
+  const question = db.question.findFirst({
+    where: { id: questionId },
+    select: {
+      id: true,
+      question: true,
+      image: true,
+      timer: true,
+      quizId: true,
+      answers: {
+        select: {
+          id: true,
+          text: true,
+          isCorrect: true,
+          order: true,
+        },
+      },
+    },
+  });
+
+  return question;
+};
+
+/**
+ * Update question and answers
+ * @returns
+ */
+export const updateQuestion = async (formData: QuestionWithAnswersUpdate) => {
+
+  if (!isAdmin) {
+    throw new Error("Action impossible");
+  }
+
+  try {
+
+    const { id } = formData;
+    const { answers, ...question } = formData;
+
+    // update question
+    const updatedQuestion = await db.question.update({
+      where: { id },
+      data: question
     });
 
-    // create answer
+    if (!updatedQuestion.id) {
+      throw new Error("Question non trouvée");
+    }
+
+    // update answers
+    await db.answer.deleteMany({
+      where: { questionId: id },
+    });
     await db.answer.createMany({
-        data: answers.map((answer, index) => ({...answer, questionId: newQuestion.id, order: index+1 }))
-    })
+      data: answers.map((answer, index) => ({
+        ...answer,
+        questionId: updatedQuestion.id,
+        order: index + 1,
+      })),
+    });
+
+    const result = await getQuestionById(updatedQuestion.id);
+    const quiz = await getQuizById(updatedQuestion.quizId);
 
     return {
-        success : "question created with success"
+        success: "Question mis à jour avec succès",
+        question: result,
+        quiz
     }
-}
+
+  } catch (error) {
+    return {
+        error: (error as Error).message
+    };
+  }
+};
 
 export const isAdmin = async () => {
-    const session = await auth();
-    return !session || session.user.role !== 'ADMIN';
-}
+  const session = await auth();
+  return !session || session.user.role !== "ADMIN";
+};
