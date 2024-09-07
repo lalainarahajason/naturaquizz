@@ -232,7 +232,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       }
     };
 
-    const fetchQuizs = async () => {
+    const fetchQuizs = async (): Promise<void> => {
       try {
         const result = await getQuizs();
         if (result) {

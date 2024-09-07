@@ -52,9 +52,6 @@ function ListeQuiz() {
 
   useEffect(() => {
     startTransition(() => {
-
-      
-
       getQuestions()
         .then((results) => {
 
@@ -67,9 +64,6 @@ function ListeQuiz() {
             quizData.forEach((quiz) => {
               quizMap.set(quiz.id as string, quiz.title);
               setQuizs(quizMap);
-
-            
-
             });
           });
         })
