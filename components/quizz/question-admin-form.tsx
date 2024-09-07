@@ -245,7 +245,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
     fetchQuestionById();
     fetchQuizs();
 
-  }, []);
+  });
 
   return (
     <RoleGate allowedRole="ADMIN">
