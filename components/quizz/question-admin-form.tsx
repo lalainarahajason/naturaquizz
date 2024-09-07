@@ -2,10 +2,16 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-
-import { QuestionFormValues, QuizFormValues } from "@/schemas/quiz";
+import { useParams } from "next/navigation";
+import {
+  QuestionFormValues,
+  QuizFormValues,
+  QuestionWithAnswers,
+  QuestionWithAnswersUpdate,
+} from "@/schemas/quiz";
 
 import { deleteImage } from "@/actions/quiz-admin/image";
+import { getQuestionById } from "@/actions/quiz-admin/question";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,48 +42,40 @@ import { RoleGate } from "@/components/auth/role-gate";
 import { PlusCircleIcon, Trash2Icon, Loader2 } from "lucide-react";
 import QuestionSidebar from "@/components/quizz/question-admin-sidebar";
 
-import { getQuizs, updateQuiz } from "@/actions/quiz-admin/quiz";
-import { createQuestion } from "@/actions/quiz-admin/question";
+import { getQuizs } from "@/actions/quiz-admin/quiz";
+import { createQuestion, updateQuestion } from "@/actions/quiz-admin/question";
 
 import { toast } from "sonner";
+import { getPublicIdFromUrl } from "@/lib/utils";
 
-type QuestionWithAnswers = {
-  question: string;
-  timer: number;
-  quizId: string;
-  image: string;
-  answers: {
-    text: string;
-    isCorrect: boolean;
-    order: number;
-  }[];
-};
-
-function QuestionAdminForm({
-  initialData,
-  mode = "create",
-}: {
-  initialData: QuestionWithAnswers | null;
-  mode: string;
-}) {
-  const [imageUrl, setImageUrl] = useState<string | null>(
-    initialData?.image || null
-  );
-
-  const [publicImageId, setPublicImageId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const [quizsList, setQuizsList] = useState<QuizFormValues[]>([]);
+function QuestionAdminForm({ mode = "create" }: { mode: string }) {
+  const params = useParams<{ id: string }>();
   const [selectedQuiz, setSelectedQuiz] = useState<string>("");
+  const [isPending, startTransition] = useTransition();
+
+  const [quizsList, setQuizsList] = useState<QuizFormValues[]>([]);
+  const [initialData, setInitialData] = useState<QuestionFormValues | null>(
+    null
+  );
+  const [state, setState] = useState<{
+    imageUrl: string | null;
+    publicImageId: string | null;
+    quizsList: QuizFormValues[];
+    selectedQuiz: string;
+  }>({
+    imageUrl: null,
+    publicImageId: null,
+    quizsList: [],
+    selectedQuiz: "",
+  });
 
   const form = useForm<QuestionFormValues>({
     defaultValues: {
-      quizId: initialData?.quizId || "",
-      question: initialData?.question || "",
-      image: initialData?.image || "",
-      timer: initialData?.timer || 60,
-      answers: initialData?.answers || [
-        { text: "", isCorrect: false, order: 0 },
-      ],
+      quizId: "",
+      question: "",
+      image: "",
+      timer: 60,
+      answers: [{ text: "", isCorrect: false, order: 0 }],
     },
   });
 
@@ -108,20 +106,27 @@ function QuestionAdminForm({
 
   const handleImageUpload = async (result: any) => {
     if (result.event === "success") {
-      setImageUrl(result.info.secure_url);
-      setPublicImageId(result.info.public_id);
+      setState((prevState) => ({
+        ...prevState,
+        imageUrl: result.info.secure_url,
+        publicImageId: result.info.public_id,
+      }));
     }
   };
 
   const handleImageDelete = async () => {
-    if (imageUrl) {
+    if (state.imageUrl) {
       startTransition(() => {
-        deleteImage(publicImageId).then((data) => {
+        
+        deleteImage(state.publicImageId).then((data) => {
           if (data.error) {
             toast(data.error);
           }
           if (data.success) {
-            setImageUrl(null);
+            setState((prevState) => ({
+              ...prevState,
+              imageUrl: null,
+            }));
             form.setValue("image", "");
             toast(data.success);
           }
@@ -131,48 +136,115 @@ function QuestionAdminForm({
   };
 
   const onSubmit = async (data: QuestionFormValues): Promise<void> => {
-    startTransition(() => {
+    if (isPending) return;
 
+    startTransition(() => {
       // update question of a quiz
       const currentQuiz = quizsList.find((quiz) => quiz.id === data.quizId);
 
       if (currentQuiz) {
-        
         const question = {
           quizId: data.quizId,
           question: data.question,
-          image: "",
+          image: state.imageUrl as string,
           timer: data.timer,
           answers: data.answers,
-        }
+        };
 
-        createQuestion(question).then((result) => {
-          if (result.success) {
-            form.reset();
-            setImageUrl(null);
-            toast(result.success);
-          } else {
-            toast(result.error as string);
-          }
-        });
+        // mode create or edit
+        if (mode === "edit") {
+          const questionWithAnswers: QuestionWithAnswersUpdate = {
+            ...question,
+            id: params.id,
+          };
+
+          updateQuestion(questionWithAnswers).then((result) => {
+            if (result.success) {
+              // update form
+              form.reset({
+                quizId: result.question?.quizId,
+                question: result.question?.question,
+                image: result.question?.image as string,
+                timer: result.question?.timer,
+                answers: result.question?.answers,
+              });
+
+              toast(result.success);
+            } else {
+              toast(result.error as string);
+            }
+          });
+        } else {
+          createQuestion(question).then((result) => {
+            if (result.success) {
+              form.reset();
+              setState((prevState) => ({
+                ...prevState,
+                imageUrl: null,
+              }));
+              toast(result.success);
+            } else {
+              toast(result.error as string);
+            }
+          });
+        }
       }
     });
   };
 
   useEffect(() => {
-    /**
-     * Get list of quizs
-     */
-    getQuizs()
-      .then((result) => {
-        console.log(result)
+    const fetchQuestionById = async () => {
+      const result = await getQuestionById(params.id);
+      if (result) {
+        setInitialData({
+          question: result.question,
+          timer: result.timer,
+          answers: result.answers,
+          quizId: result.quizId,
+          image: result.image || undefined,
+        });
+
+        if (result.image) {
+          const publicImageId = getPublicIdFromUrl(result.image);
+          setState((prevState) => ({
+            ...prevState,
+            imageUrl: result.image,
+            publicImageId
+          }));
+        }
+
+        // update form default values
+        form.reset({
+          question: result.question,
+          timer: result.timer,
+          answers: result.answers,
+          quizId: result.quizId,
+          image: result.image || undefined,
+        });
+
+        const currentQuiz = quizsList.find((quiz) => quiz.id === result.quizId);
+        
+        if(currentQuiz) {
+          setSelectedQuiz(currentQuiz.title)
+        }
+        
+      }
+    };
+
+    const fetchQuizs = async () => {
+      try {
+        const result = await getQuizs();
         if (result) {
           setQuizsList(result as QuizFormValues[]);
         }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      } catch (error) {
+        toast("Failed to fetch quizzes");
+      }
+    };
+
+    fetchQuestionById();
+    fetchQuizs();
+
   }, []);
 
   return (
@@ -184,10 +256,17 @@ function QuestionAdminForm({
         >
           <Card className="w-full lg:w-[600px]">
             <CardHeader className="uppercase text-center font-bold">
-              Ajouter une question
+              
+              { mode === "edit" && (
+                <div>Question :  { initialData?.question }</div>
+              )}
+
+              {mode != "edit" && "Ajouter une question" }
+
             </CardHeader>
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
+              
               {quizsList && (
                 <FormField
                   control={form.control}
@@ -204,7 +283,7 @@ function QuestionAdminForm({
                             );
                           });
                         }}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Choisir un quiz" />
@@ -228,6 +307,8 @@ function QuestionAdminForm({
                 ></FormField>
               )}
 
+              
+
               {/** Question */}
               <FormField
                 name="question"
@@ -247,7 +328,7 @@ function QuestionAdminForm({
               <FormLabel>Réponses</FormLabel>
               {answers.map((answer, index) => (
                 <div
-                  key={answer.id}
+                  key={index}
                   className="flex flex-wrap gap-4 justify-between items-center"
                 >
                   <FormField
@@ -304,7 +385,7 @@ function QuestionAdminForm({
           {/** Sidebar */}
           <QuestionSidebar
             form={form}
-            imageUrl={imageUrl}
+            imageUrl={state.imageUrl}
             isPending={isPending}
             initialData={initialData}
             handleImageUpload={handleImageUpload}

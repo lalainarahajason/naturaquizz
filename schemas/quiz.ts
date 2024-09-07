@@ -25,5 +25,20 @@ export const quizSchema = z.object({
   questions: z.array(questionSchema).optional()
 });
 
+export type QuestionWithAnswers = {
+  question: string;
+  timer: number;
+  quizId: string;
+  image: string|undefined;
+  answers: {
+    text: string;
+    isCorrect: boolean;
+    order: number;
+  }[];
+};
+
+export type QuestionWithAnswersUpdate = QuestionWithAnswers & {
+  id: string;
+}
 export type QuizFormValues = z.infer<typeof quizSchema>;
 export type QuestionFormValues = z.infer<typeof questionSchema>;
