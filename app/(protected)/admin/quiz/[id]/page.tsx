@@ -10,11 +10,19 @@ import { FormError } from "@/components/form-error";
 
 import { Card, CardHeader, CardContent} from "@/components/ui/card";
 
- function Edit() {
+
+// Cloudinary
+import { getCloudinaryMedia } from "@/actions/quiz-admin/getCloudinaryMedia";
+import MediaExplorer from "@/components/media-explorer";
+import { CloudinarySearchResult } from "@/schemas/cloudinary";
+
+function Edit() {
 
   const params = useParams<{id:string}>();
   const [error, setError] = useState<string|undefined>(undefined);
   const [quiz, setQuiz] = useState<Quiz|null>(null);
+  const [cloudinaryInitialData, setCloudinaryInitialData] = useState<CloudinarySearchResult|undefined>()
+
   
   useEffect(() => {
     const getQuiz = async () => {
@@ -29,10 +37,18 @@ import { Card, CardHeader, CardContent} from "@/components/ui/card";
     }
     getQuiz();
 
+    const mediaExplorer = async () => {
+      const initialData: CloudinarySearchResult = await getCloudinaryMedia({ expression: 'resource_type:image' });
+      setCloudinaryInitialData(initialData);
+    }
+    mediaExplorer();
+
   }, [params.id]);
 
   return (
     <>
+      <MediaExplorer initialData={cloudinaryInitialData as CloudinarySearchResult} />
+
       {error ? (
         <Card className="w-[600px]">
           <CardHeader>
