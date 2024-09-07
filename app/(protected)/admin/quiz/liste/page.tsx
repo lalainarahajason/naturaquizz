@@ -16,6 +16,19 @@ import Loading from "@/components/loading";
 import { toast } from "sonner";
 
 import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import {
   Table,
   TableBody,
   TableCaption,
@@ -29,16 +42,27 @@ import {
 import moment from "moment";
 import Link from "next/link";
 
-import { Trash2, Edit, LayoutGrid, Plus } from "lucide-react";
+import {
+  Trash2,
+  Edit,
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+
 import NoList from "@/app/(protected)/admin/_components/no-list";
 import AddItem from "../../_components/add-item";
 import { QuizFormValues } from "@/schemas/quiz";
+import { FilterItems } from "@/app/(protected)/admin/_components/filter";
 
 function ListeQuiz() {
   const [quizs, setQuizs] = useState<QuizFormValues[] | undefined>(undefined);
+  const [filteredQuizs, setFilteredQuizs] = useState<QuizFormValues[] | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
-
   const rowRefs = useRef<Map<string, HTMLTableRowElement | null>>(new Map());
 
   useEffect(() => {
@@ -47,6 +71,7 @@ function ListeQuiz() {
         .then((results) => {
           console.log(results);
           setQuizs(results);
+          setFilteredQuizs(results);
         })
         .catch((error) => {
           console.error(error);
@@ -65,6 +90,22 @@ function ListeQuiz() {
     []
   );
 
+  /**
+   * Filters the list of quizzes based on the provided search value.
+   * @param value - The search value to filter the quizzes by.
+   */
+  const handleFilter = (value:string) => {
+    if(quizs) {
+      const filtered = quizs.filter((quiz) => quiz.title.toLocaleLowerCase().includes(value.toLocaleLowerCase()))
+      setFilteredQuizs(filtered);
+    }
+    
+  }
+
+  /**
+   * Deletes a quiz from the database and updates the UI accordingly.
+   * @param id - The ID of the quiz to be deleted.
+   */
   const handleDeleteQuiz = async (id: string) => {
     const row = rowRefs.current.get(id);
     console.log(row);
@@ -106,31 +147,37 @@ function ListeQuiz() {
       <>
         {quizs && quizs.length === 0 && (
           <>
-            <NoList message="🙄 Aucun quiz disponible" label="ajouter" link="/admin/quiz/add" />
+            <NoList
+              message="🙄 Aucun quiz disponible"
+              label="ajouter"
+              link="/admin/quiz/add"
+            />
           </>
         )}
         {quizs && quizs.length > 0 && (
           <>
             <div className="flex justify-between items-center gap-2 mb-4">
               <>
-              <h2 className="text-center uppercase font-bold text-2xl flex justify-center items-center gap-2">
-              <AddItem href="/admin/quiz/add" />
-                Tous les quizs
-              </h2>
+                <h2 className="text-center uppercase font-bold text-2xl flex justify-center items-center gap-2">
+                  <AddItem href="/admin/quiz/add" />
+                  Tous les quizs
+                </h2>
               </>
             </div>
+            <FilterItems defaultValue="" handleFilter={handleFilter} placeholder="Trouver un quiz..." />
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Nom</TableHead>
                   <TableHead className="text-center">Questions</TableHead>
-                  <TableHead >Description</TableHead>
+                  <TableHead>Description</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {quizs &&
-                  quizs.map((quiz, index) => {
+                {filteredQuizs &&
+                  filteredQuizs.map((quiz, index) => {
+                    const questionsLength = quiz.questions?.length;
                     return (
                       <TableRow key={index} ref={setRowRef(quiz.id as string)}>
                         <TableCell>
@@ -143,7 +190,9 @@ function ListeQuiz() {
                             </Link>
                           </h1>
                         </TableCell>
-                        <TableCell className="text-center">{quiz.questions?.length}</TableCell>
+                        <TableCell className="text-center">
+                          <Link href={`/admin/question/liste?filterByQuiz=${encodeURIComponent(quiz.title)}`}><Badge>{questionsLength} question{questionsLength && questionsLength > 1 ? 's':''}</Badge></Link>
+                        </TableCell>
                         <TableCell>{quiz.description}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-x-2">
@@ -152,7 +201,9 @@ function ListeQuiz() {
                             </Link>
                             <Button
                               variant="link"
-                              onClick={() => handleDeleteQuiz(quiz.id as string)}
+                              onClick={() =>
+                                handleDeleteQuiz(quiz.id as string)
+                              }
                             >
                               <Trash2 className="cursor-pointer text-red-600" />
                             </Button>
