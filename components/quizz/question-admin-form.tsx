@@ -193,6 +193,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   };
 
   useEffect(() => {
+    
     const fetchQuestionById = async () => {
       const result = await getQuestionById(params.id);
       if (result) {
@@ -242,10 +243,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       }
     };
 
-    fetchQuestionById();
+    if(params.id) {
+      fetchQuestionById();
+      
+    }
     fetchQuizs();
-
-  });
+    
+  }, [params.id]);
 
   return (
     <RoleGate allowedRole="ADMIN">

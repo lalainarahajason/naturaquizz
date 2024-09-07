@@ -115,7 +115,7 @@ model Question {
   image    String?
   timer    Int      @default(60)
   answers  Answer[] @relation("QuestionToAnswer")
-  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz     Quiz     @relation(fields: [quizId], references: [id])
   quizId   String
 }
 

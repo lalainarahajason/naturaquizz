@@ -40,5 +40,6 @@ export type QuestionWithAnswers = {
 export type QuestionWithAnswersUpdate = QuestionWithAnswers & {
   id: string;
 }
+
 export type QuizFormValues = z.infer<typeof quizSchema>;
 export type QuestionFormValues = z.infer<typeof questionSchema>;

@@ -25,6 +25,8 @@ import Link from "next/link";
 import { Trash2, Edit, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getQuestions } from "@/actions/quiz-admin/question";
+import NoList from "@/app/(protected)/admin/_components/no-list";
+import AddItem from "../../_components/add-item";
 
 function ListeQuiz() {
   
@@ -107,58 +109,65 @@ const setRowRef = useCallback((id: string) => (el: HTMLTableRowElement | null) =
 
     <div className="w-full">
 
-      <h2 className="text-center uppercase font-bold text-2xl mb-4 flex justify-center items-center gap-2">
-        <LayoutGrid />
-        Toutes les questions
-      </h2>
-
         <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Question</TableHead>
-                <TableHead>Quiz</TableHead>
-                <TableHead>Timer</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody >
+        {questions && questions.length === 0 && (
+          <NoList message="🙄 Aucune question disponible" label="ajouter" link="/admin/question/add" />
+        )}
+        {questions && questions.length > 0 && (
+          <>
+          <h2 className="uppercase font-bold text-2xl mb-4 flex items-center gap-2">
+            <AddItem href="/admin/question/add" />
+            Toutes les questions
+          </h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Question</TableHead>
+                  <TableHead>Quiz</TableHead>
+                  <TableHead>Timer</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody >
+                
+                {questions.map((question, index) => {
               
-              {questions && questions.map((question, index) => {
-            
-                return (
-                  <TableRow key={index} ref={setRowRef(question.id)} >
-                    <TableCell>
-                      <h1>
-                        <Link
-                          href={`/admin/question/${question.id}`}
-                          className="hover:underline underline-offset-2"
-                        >
-                          {question.question}
-                        </Link>
-                      </h1>
-                    </TableCell>
-                    <TableCell>
-                      <Link href={`/admin/quiz/${question.quizId}`}>{ quizs?.get(question.quizId) || "Chargement ..."  }</Link>
-                    </TableCell>
-                    <TableCell>
-                      {`${question.timer} s`}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-x-2">
-                        <Link href={`/admin/quiz/${question.id}`}>
-                          <Edit className="cursor-pointer" />
-                        </Link>
-                        <Button variant="link" onClick={() => handleDeleteQuiz(question.id)}>
-                          <Trash2 className="cursor-pointer text-red-600" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                  return (
+                    <TableRow key={index} ref={setRowRef(question.id)} >
+                      <TableCell>
+                        <h1>
+                          <Link
+                            href={`/admin/question/${question.id}`}
+                            className="hover:underline underline-offset-2"
+                          >
+                            {question.question}
+                          </Link>
+                        </h1>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/admin/quiz/${question.quizId}`}>{ quizs?.get(question.quizId) || "Chargement ..."  }</Link>
+                      </TableCell>
+                      <TableCell>
+                        {`${question.timer} s`}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-x-2">
+                          <Link href={`/admin/quiz/${question.id}`}>
+                            <Edit className="cursor-pointer" />
+                          </Link>
+                          <Button variant="link" onClick={() => handleDeleteQuiz(question.id)}>
+                            <Trash2 className="cursor-pointer text-red-600" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </>
+        )}
+          
         </>
     </div>
   );

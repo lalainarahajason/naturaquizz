@@ -147,7 +147,7 @@ export const deleteQuiz = async (id: string):Promise<{success?:string, error?:st
  * Get all quiz
  * @returns 
  */
-export const getQuizs = async(): Promise<Quiz[]> => {
+export const getQuizs = async(): Promise<QuizFormValues[]> => {
 
     // Get all quiz
     const quizs = await db.quiz.findMany({
@@ -183,7 +183,7 @@ export const getQuizs = async(): Promise<Quiz[]> => {
         }
     });
 
-    return quizs
+    return quizs as QuizFormValues[]; // Add type assertion
 }
 
 
