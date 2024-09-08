@@ -59,6 +59,10 @@ const Sidebar = ({
                       className="bg-primary text-white rounded-md text-xs px-4 py-2 ml-4"
                       uploadPreset="aaospnok"
                       onSuccess={handleImageUpload}
+                      options={{
+                        tags: ['naturaquiz'], // Add tags here
+                      }}
+
                     />
                   </FormControl>
                 </FormItem>

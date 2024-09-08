@@ -47,7 +47,7 @@ function Edit() {
 
   return (
     <>
-      <MediaExplorer initialData={cloudinaryInitialData as CloudinarySearchResult} />
+      {/* <MediaExplorer initialData={cloudinaryInitialData as CloudinarySearchResult} /> */}
 
       {error ? (
         <Card className="w-[600px]">
