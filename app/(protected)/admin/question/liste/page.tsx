@@ -37,6 +37,7 @@ import { getQuestions } from "@/actions/quiz-admin/question";
 import NoList from "@/app/(protected)/admin/_components/no-list";
 import AddItem from "../../_components/add-item";
 import { FilterItems } from "@/app/(protected)/admin/_components/filter";
+import { Badge } from "@/components/ui/badge";
 
 function ListeQuiz() {
   const [questions, setQuestions] = useState<Question[] | null>(null);
@@ -199,7 +200,9 @@ function ListeQuiz() {
                           <Link href={`/admin/quiz/${question.quizId}`}>
                             {quizs?.get(question.quizId as string) }
                           </Link>
-                        ) : "non classé"}
+                        ) : (
+                          <Badge variant="outline">non classé</Badge>
+                        )}
 
                       </TableCell>
                       <TableCell>{`${question.timer} s`}</TableCell>
