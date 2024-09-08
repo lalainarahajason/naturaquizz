@@ -130,7 +130,7 @@ function ListeQuiz() {
   const handleFilter = (value:string) => {
     if(questions) {
       const filteredQuestions = questions.filter((question) => {
-        const quizTitle = quizs?.get(question.quizId);
+        const quizTitle = quizs?.get(question.quizId as string);
         return (
           question.question.toLowerCase().includes(value.toLowerCase()) ||
           quizTitle?.toLowerCase().includes(value.toLowerCase())
@@ -152,9 +152,9 @@ function ListeQuiz() {
           />
         )}
         
-        {filteredQuestions && (
+        {questions && questions.length > 0 && filteredQuestions && (
           <>
-            <h2 className="uppercase font-bold text-2xl mb-4 flex items-center gap-2">
+            <h2 className="font-bold text-2xl mb-4 flex items-center gap-2">
               <AddItem href="/admin/question/add" />
               Toutes les questions
             </h2>
@@ -194,9 +194,13 @@ function ListeQuiz() {
                         </h1>
                       </TableCell>
                       <TableCell>
-                        <Link href={`/admin/quiz/${question.quizId}`}>
-                          {quizs?.get(question.quizId) || "Chargement ..."}
-                        </Link>
+
+                        {question.quizId ? (
+                          <Link href={`/admin/quiz/${question.quizId}`}>
+                            {quizs?.get(question.quizId as string) }
+                          </Link>
+                        ) : "non classé"}
+
                       </TableCell>
                       <TableCell>{`${question.timer} s`}</TableCell>
                       <TableCell className="text-right">

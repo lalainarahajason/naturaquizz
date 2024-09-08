@@ -132,6 +132,12 @@ export const deleteQuiz = async (id: string):Promise<{success?:string, error?:st
                 error: "Ce quiz n'existe pas"
             }
         }
+
+        // add null to quizId of all question
+        await db.question.updateMany({
+            where: { quizId: id },
+            data: { quizId: undefined }
+        });
     
         // delete quiz
         await db.quiz.delete({
