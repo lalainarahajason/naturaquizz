@@ -3,10 +3,7 @@ import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import {
-  getUserMenuList,
-  getAdminMenuList,
-} from "../data/menu-list";
+import { getUserMenuList, getAdminMenuList } from "../data/menu-list";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

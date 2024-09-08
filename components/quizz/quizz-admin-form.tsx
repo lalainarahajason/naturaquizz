@@ -32,12 +32,6 @@ import { Quiz } from "@prisma/client";
 
 import Sidebar from "./quiz-admin-sidebar";
 
-type initialDataType = {
-  title?: string;
-  description?: string;
-  image?: string;
-};
-
 function QuizzAdminForm({
   initialData,
   mode = "create",

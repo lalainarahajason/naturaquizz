@@ -1,19 +1,15 @@
-"use server";
+"use client";
 
-import { CurrentUser } from "@/lib/auth";
 import QuizzAdminForm from "@/components/quizz/quizz-admin-form";
+import { RoleGate } from "@/components/auth/role-gate";
 
 async function Quizz() {
 
-    const user = await CurrentUser();
-    const isAdmin = user?.role === 'ADMIN';
-
     return (
-        <>
-            {isAdmin && <QuizzAdminForm mode="create" />}
-        </>
+        <RoleGate allowedRole="ADMIN">
+            <QuizzAdminForm mode="create" />
+        </RoleGate>
         
-
     )
 }
 

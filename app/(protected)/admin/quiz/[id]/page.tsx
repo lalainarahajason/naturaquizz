@@ -16,6 +16,8 @@ import { getCloudinaryMedia } from "@/actions/quiz-admin/getCloudinaryMedia";
 import MediaExplorer from "@/components/media-explorer";
 import { CloudinarySearchResult } from "@/schemas/cloudinary";
 
+import { RoleGate } from "@/components/auth/role-gate";
+
 function Edit() {
 
   const params = useParams<{id:string}>();
@@ -46,7 +48,7 @@ function Edit() {
   }, [params.id]);
 
   return (
-    <>
+    <RoleGate allowedRole="ADMIN">
       {/* <MediaExplorer initialData={cloudinaryInitialData as CloudinarySearchResult} /> */}
 
       {error ? (
@@ -63,7 +65,7 @@ function Edit() {
           
         </Card>
       ) : <QuizzAdminForm initialData={quiz} mode="edit" /> }
-    </>
+    </RoleGate>
   )
 }
 
