@@ -36,6 +36,17 @@ import {
 } from "@/components/ui/select";
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { RoleGate } from "@/components/auth/role-gate";
 
@@ -46,7 +57,7 @@ import { getQuizs } from "@/actions/quiz-admin/quiz";
 import { createQuestion, updateQuestion } from "@/actions/quiz-admin/question";
 
 import { toast } from "sonner";
-import { getPublicIdFromUrl } from "@/lib/utils";
+import { cn, getPublicIdFromUrl } from "@/lib/utils";
 
 function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   const params = useParams<{ id: string }>();
@@ -68,6 +79,10 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
     quizsList: [],
     selectedQuiz: "",
   });
+
+  const [error, setError] = useState<{ type: string; message: string } | null>(
+    null
+  );
 
   const form = useForm<QuestionFormValues>({
     defaultValues: {
@@ -117,7 +132,6 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   const handleImageDelete = async () => {
     if (state.imageUrl) {
       startTransition(() => {
-        
         deleteImage(state.publicImageId).then((data) => {
           if (data.error) {
             toast(data.error);
@@ -142,9 +156,16 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       // update question of a quiz
       const currentQuiz = quizsList.find((quiz) => quiz.id === data.quizId);
 
+      if (!currentQuiz) {
+        setError({
+          type: "error",
+          message: "⚠️ Veuillez choisir un quiz",
+        });
+      }
+
       if (currentQuiz) {
         const question = {
-          quizId: data.quizId,
+          quizId: data.quizId || undefined,
           question: data.question,
           image: state.imageUrl as string,
           timer: data.timer,
@@ -162,7 +183,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
             if (result.success) {
               // update form
               form.reset({
-                quizId: result.question?.quizId,
+                quizId: result.question?.quizId || undefined,
                 question: result.question?.question,
                 image: result.question?.image as string,
                 timer: result.question?.timer,
@@ -193,7 +214,6 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   };
 
   useEffect(() => {
-    
     const fetchQuestionById = async () => {
       const result = await getQuestionById(params.id);
       if (result) {
@@ -201,7 +221,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
           question: result.question,
           timer: result.timer,
           answers: result.answers,
-          quizId: result.quizId,
+          quizId: result.quizId as string,
           image: result.image || undefined,
         });
 
@@ -210,7 +230,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
           setState((prevState) => ({
             ...prevState,
             imageUrl: result.image,
-            publicImageId
+            publicImageId,
           }));
         }
 
@@ -219,36 +239,39 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
           question: result.question,
           timer: result.timer,
           answers: result.answers,
-          quizId: result.quizId,
+          quizId: result.quizId || undefined,
           image: result.image || undefined,
         });
 
         const currentQuiz = quizsList.find((quiz) => quiz.id === result.quizId);
-        
-        if(currentQuiz) {
-          setSelectedQuiz(currentQuiz.title)
+
+        if (currentQuiz) {
+          setSelectedQuiz(currentQuiz.title);
         }
-        
       }
     };
 
     const fetchQuizs = async (): Promise<void> => {
       try {
         const result = await getQuizs();
-        if (result) {
+
+        if (result.length) {
           setQuizsList(result as QuizFormValues[]);
+        } else {
+          setError({
+            type: "warning",
+            message: "Attention, aucun quiz trouvé dans la base",
+          });
         }
       } catch (error) {
         toast("Failed to fetch quizzes");
       }
     };
 
-    if(params.id) {
+    if (params.id) {
       fetchQuestionById();
-      
     }
     fetchQuizs();
-    
   }, [params.id]);
 
   return (
@@ -259,18 +282,33 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
           className="grid grid-flow-row lg:grid-flow-col items-start gap-4"
         >
           <Card className="w-full lg:w-[600px]">
-            <CardHeader className="uppercase text-center font-bold">
-              
-              { mode === "edit" && (
-                <div>Question :  { initialData?.question }</div>
+            <CardHeader className="text-center">
+              {mode === "edit" && (
+                <div className="uppercase font-bold">
+                  Question : {initialData?.question}
+                </div>
               )}
 
-              {mode != "edit" && "Ajouter une question" }
+              {mode != "edit" && (
+                <div className="uppercase font-bold">Ajouter une question</div>
+              )}
 
+              {error && (
+                <div
+                  className={cn(
+                    "rounded-sm mb-4 text-sm p-3",
+                    error.type === "error"
+                      ? "bg-red-50 text-red-700"
+                      : "bg-blue-100/20 text-blue-900"
+                  )}
+                >
+                  {error.message}
+                </div>
+              )}
             </CardHeader>
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
-              
+
               {quizsList && (
                 <FormField
                   control={form.control}
@@ -281,6 +319,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                         onValueChange={(value) => {
                           field.onChange(value);
                           setSelectedQuiz(() => {
+                            setError(null);
                             return (
                               quizsList.find((quiz) => quiz.id === value)
                                 ?.title || ""
@@ -310,8 +349,6 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                   )}
                 ></FormField>
               )}
-
-              
 
               {/** Question */}
               <FormField

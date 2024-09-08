@@ -9,6 +9,7 @@ import { getQuizById } from "./quiz";
 
 // Create a single question
 export const createQuestion = async (question: QuestionFormValues) => {
+
   if (!isAdmin()) {
     // if user is not admin abort
     return {
@@ -17,6 +18,8 @@ export const createQuestion = async (question: QuestionFormValues) => {
   }
 
   const { answers, ...questionData } = question;
+
+  console.log(questionData)
 
   // create new question
   const newQuestion = await db.question.create({
@@ -146,7 +149,7 @@ export const updateQuestion = async (formData: QuestionWithAnswersUpdate) => {
     });
 
     const result = await getQuestionById(updatedQuestion.id);
-    const quiz = await getQuizById(updatedQuestion.quizId);
+    const quiz = await getQuizById(updatedQuestion.quizId as string);
 
     return {
         success: "Question mis à jour avec succès",
