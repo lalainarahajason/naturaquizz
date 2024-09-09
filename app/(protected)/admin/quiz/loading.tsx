@@ -1,6 +1,6 @@
 function Loading() {
   return (
-    <div>loading</div>
+    <div className="fixed top-0 left-0 w-full h-full bg-red-300 flex justify-center items-center">loading</div>
   )
 }
 
