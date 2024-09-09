@@ -126,13 +126,13 @@ function ListeQuiz() {
           <div className="w-full">
             <>
               {quizs && quizs.length === 0 && (
-                <>
+                <Suspense fallback={<Loading />}>
                   <NoList
                     message="🙄 Aucun quiz disponible"
                     label="ajouter"
                     link="/admin/quiz/add"
                   />
-                </>
+                </Suspense>
               )}
                 {quizs && quizs.length > 0 && (
                   <>
