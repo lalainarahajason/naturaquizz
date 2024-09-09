@@ -122,7 +122,7 @@ function ListeQuiz() {
   };
 
   return (
-    <Suspense fallback={<Loading />}>
+    
       <RoleGate allowedRole="ADMIN">
           <div className="w-full">
             <>
@@ -136,7 +136,7 @@ function ListeQuiz() {
                 </>
               )}
               {quizs && quizs.length > 0 && (
-                <>
+                <Suspense fallback={<Loading />}>
                   <div className="flex justify-between items-center gap-2 mb-4">
                     <>
                       <h2 className="text-center uppercase font-bold text-2xl flex justify-center items-center gap-2">
@@ -195,12 +195,12 @@ function ListeQuiz() {
                         })}
                     </TableBody>
                   </Table>
-                </>
+                </Suspense>
               )}
             </>
           </div>
       </RoleGate>
-    </Suspense>
+    
   );
 }
 
