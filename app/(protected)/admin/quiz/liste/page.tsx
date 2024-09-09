@@ -1,3 +1,4 @@
+"use server";
 
 import { getQuizs } from "@/actions/quiz-admin/quiz";
 import Loading from "@/components/loading";
