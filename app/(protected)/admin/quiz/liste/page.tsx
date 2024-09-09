@@ -49,7 +49,6 @@ function ListeQuiz() {
     startTransition(() => {
       getQuizs()
         .then((results) => {
-          console.log(results);
           setQuizs(results);
           setFilteredQuizs(results);
         })
@@ -135,7 +134,6 @@ function ListeQuiz() {
                   />
                 </>
               )}
-              <Suspense fallback={<Loading />}>
                 {quizs && quizs.length > 0 && (
                   <>
                     <div className="flex justify-between items-center gap-2 mb-4">
@@ -198,7 +196,6 @@ function ListeQuiz() {
                     </Table>
                   </>
                 )}
-              </Suspense>
             </>
           </div>
       </RoleGate>
