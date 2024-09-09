@@ -1,3 +1,5 @@
+"use server";
+
 import AdminSidebar from "@/components/sidebar";
 import Loading from "@/components/loading";
 import { Suspense } from "react";
