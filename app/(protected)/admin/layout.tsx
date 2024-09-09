@@ -8,7 +8,8 @@ function layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="bg-white w-full max-w-[1024px] relative">
       <AdminSidebar />
-      {children}
+
+      <Suspense fallback={<Loading />}>{children}</Suspense>
     </div>
   );
 }

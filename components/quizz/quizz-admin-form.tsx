@@ -6,7 +6,6 @@ import { useEffect, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { quizSchema, QuizFormValues } from "@/schemas/quiz";
 
-import { RoleGate } from "@/components/auth/role-gate";
 import { createQuiz, getQuizById, updateQuiz } from "@/actions/quiz-admin/quiz";
 import { deleteImage } from "@/actions/quiz-admin/image";
 
@@ -133,8 +132,7 @@ function QuizzAdminForm({
 
   return (
     <>
-      <RoleGate allowedRole="ADMIN">
-        <Form {...form}>
+      <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="grid grid-flow-row lg:grid-flow-col items-start gap-4"
@@ -206,8 +204,7 @@ function QuizzAdminForm({
               onSubmit={onSubmit}
             />
           </form>
-        </Form>
-      </RoleGate>
+      </Form>
     </>
   );
 }
