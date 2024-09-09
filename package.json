@@ -43,6 +43,7 @@
     "react-icons": "^5.2.1",
     "react-loading": "^2.0.3",
     "react-loading-skeleton": "^3.4.0",
+    "react-query": "^3.39.3",
     "react-spinners": "^0.14.1",
     "resend": "^3.5.0",
     "sonner": "^1.5.0",

@@ -1,11 +1,11 @@
+import { Loader2 } from "lucide-react";
 
-import "react-loading-skeleton/dist/skeleton.css";
-
-
-export default function Loading() {
+function Loading() {
   return (
-    <div className="flex justify-center items-center text-center">
-        Chargement ...
+    <div className="fixed top-0 left-0 w-full h-full bg-white/60 flex justify-center items-center">
+      <Loader2 className="h-14 w-14 animate-spin" />
     </div>
-  );
+  )
 }
+
+export default Loading;

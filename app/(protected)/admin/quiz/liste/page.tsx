@@ -10,9 +10,8 @@ function ListeQuizs() {
   const initialData = getQuizs();
 
   return (
-    <Suspense fallback={ <Loading /> }>
-      <QuizsList initialData={initialData} />
-    </Suspense>
+    
+     <QuizsList initialData={initialData} />
   )
 }
 
