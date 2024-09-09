@@ -46,8 +46,7 @@ function ListeQuiz() {
   const rowRefs = useRef<Map<string, HTMLTableRowElement | null>>(new Map());
 
   useEffect(() => {
-    startTransition(() => {
-      getQuizs()
+    getQuizs()
         .then((results) => {
           setQuizs(results);
           setFilteredQuizs(results);
@@ -55,7 +54,6 @@ function ListeQuiz() {
         .catch((error) => {
           console.error(error);
         });
-    });
   }, []);
 
   const setRowRef = useCallback(
