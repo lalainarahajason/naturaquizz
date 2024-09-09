@@ -164,6 +164,32 @@ export const updateQuestion = async (formData: QuestionWithAnswersUpdate) => {
   }
 };
 
+export const deleteQuestion = async (id:string) => {
+
+  if (!isAdmin) {
+    throw new Error("Action impossible");
+  }
+
+  if(!id) {
+    throw new Error("Id question obligatoire");
+  }
+
+  try {
+
+    await db.question.delete({ where: { id } });
+
+    return {
+      success: "Question supprimée avec succès"
+    }
+    
+  } catch (error) {
+    return {
+      error: (error as Error).message
+    }
+  }
+
+}
+
 export const isAdmin = async () => {
   const session = await auth();
   return !session || session.user.role !== "ADMIN";
