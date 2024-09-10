@@ -316,8 +316,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
 
               <div className="text-center text-gray-900 bg-gray-200/40 p-3">
                   
-                  {selectedQuiz}
-                  {JSON.stringify(quizsList)}
+                  {selectedQuiz} test
                 </div>
 
               {quizsList && (
