@@ -249,10 +249,11 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
     const fetchQuizs = async (): Promise<void> => {
       try {
         const result = await getQuizs();
+      
         
-        toast(result.length)
         if (result.length) {
-          toast(`quiz récuperé`)
+          console.log("result")
+          console.log(result)
           setQuizsList(result as QuizFormValues[]);
         } else {
           toast(`quiz error`)
