@@ -332,7 +332,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                           setSelectedQuiz(() => {
                             setError(null);
                             return (
-                              quizsList.find((quiz) => quiz.id === value)
+                              quizsList.find((quiz) => quiz.id === initialData?.quizId)
                                 ?.title || ""
                             );
                           });
