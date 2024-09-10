@@ -314,12 +314,10 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
 
-              {mode === "edit" && (
-                <div className="text-center text-gray-900 bg-gray-200/40 p-3">
+              <div className="text-center text-gray-900 bg-gray-200/40 p-3">
                   Quiz :{" "}
-                  {JSON.stringify(QuizsList)}
+                  {JSON.stringify(quizsList)}
                 </div>
-              )}
 
               {quizsList && (
                 <FormField
