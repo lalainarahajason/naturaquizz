@@ -249,10 +249,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
     const fetchQuizs = async (): Promise<void> => {
       try {
         const result = await getQuizs();
+        
 
         if (result.length) {
+          toast(`quiz récuperé`)
           setQuizsList(result as QuizFormValues[]);
         } else {
+          toast(`quiz error`)
           setError({
             type: "warning",
             message: "Attention, aucun quiz trouvé dans la base",
