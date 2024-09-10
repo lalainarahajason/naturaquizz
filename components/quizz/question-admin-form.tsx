@@ -49,6 +49,7 @@ import { createQuestion, updateQuestion } from "@/actions/quiz-admin/question";
 
 import { toast } from "sonner";
 import { cn, getPublicIdFromUrl } from "@/lib/utils";
+import QuizsList from "./quiz-list";
 
 function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   const params = useParams<{ id: string }>();
@@ -253,7 +254,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
         console.log(result.length)
         console.log("tzt end result")
 
-        if (result) {
+        if (result.length) {
           setQuizsList(result as QuizFormValues[]);
         } else {
           toast(`quiz error`);
@@ -316,8 +317,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
               {mode === "edit" && (
                 <div className="text-center text-gray-900 bg-gray-200/40 p-3">
                   Quiz :{" "}
-                  {quizsList.find((quiz) => quiz.id && quiz.id === "cm0wbw3cl0000upjhws8da2lj")?.title ||
-                    ""}
+                  {JSON.stringify(QuizsList)}
                 </div>
               )}
 
