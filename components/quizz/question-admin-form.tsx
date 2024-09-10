@@ -16,6 +16,8 @@ import { getQuestionById } from "@/actions/quiz-admin/question";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+
 import {
   Form,
   FormField,
@@ -36,17 +38,6 @@ import {
 } from "@/components/ui/select";
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 import { RoleGate } from "@/components/auth/role-gate";
 
@@ -88,6 +79,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
     defaultValues: {
       quizId: "",
       question: "",
+      note:"",
       image: "",
       timer: 60,
       answers: [{ text: "", isCorrect: false, order: 0 }],
@@ -167,6 +159,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
         const question = {
           quizId: data.quizId || undefined,
           question: data.question,
+          note: data.note as string,
           image: state.imageUrl as string,
           timer: data.timer,
           answers: data.answers,
@@ -185,12 +178,14 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
               form.reset({
                 quizId: result.question?.quizId || undefined,
                 question: result.question?.question,
+                note: result.question?.note as string,
                 image: result.question?.image as string,
                 timer: result.question?.timer,
                 answers: result.question?.answers,
               });
 
               toast(result.success);
+
             } else {
               toast(result.error as string);
             }
@@ -217,9 +212,12 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
     const fetchQuestionById = async () => {
       const result = await getQuestionById(params.id);
       if (result) {
+
+        console.log(result)
         setInitialData({
           question: result.question,
           timer: result.timer,
+          note:result.note as string,
           answers: result.answers,
           quizId: result.quizId as string,
           image: result.image || undefined,
@@ -241,6 +239,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
           answers: result.answers,
           quizId: result.quizId || undefined,
           image: result.image || undefined,
+          note: result.note || undefined
         });
 
         const currentQuiz = quizsList.find((quiz) => quiz.id === result.quizId);
@@ -421,6 +420,21 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                   Ajouter une réponse
                 </Button>
               </div>
+
+              {/** Note */}
+              <FormField
+                name="note"
+                control={control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Note explicative pour la réponse</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} disabled={isPending} />
+                    </FormControl>
+                    <FormMessage>{errors.question?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
             </CardContent>
           </Card>
           {/** Sidebar */}

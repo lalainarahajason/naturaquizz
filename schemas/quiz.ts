@@ -10,6 +10,7 @@ export const answerSchema = z.object({
 export const questionSchema = z.object({
   question: z.string(),
   image: z.string().optional(),
+  note: z.string().optional(),
   timer: z.number().int().default(60),
   answers: z.array(answerSchema).min(2, "At least 2 answers"), // Nous utilisons z.any() car nous n'avons pas le détail du schéma Answer
   quizId: z.string().optional(),
@@ -28,6 +29,7 @@ export const quizSchema = z.object({
 export type QuestionWithAnswers = {
   question: string;
   timer: number;
+  note: string;
   quizId: string|undefined;
   image: string|undefined;
   answers: {

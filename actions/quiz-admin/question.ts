@@ -60,6 +60,7 @@ export const getQuestions = async (): Promise<Question[] | null> => {
       question: true,
       image: true,
       timer: true,
+      note: true,
       quizId: true,
       answers: {
         select: {
@@ -97,6 +98,7 @@ export const getQuestionById = async (questionId: string) => {
       image: true,
       timer: true,
       quizId: true,
+      note:true,
       answers: {
         select: {
           id: true,

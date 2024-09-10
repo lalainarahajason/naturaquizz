@@ -93,6 +93,7 @@ model Quiz {
 model Question {
   id       String   @id @default(cuid())
   question String
+  note     String?
   image    String?
   timer    Int      @default(60)
   quizId   String?
