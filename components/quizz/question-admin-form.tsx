@@ -250,7 +250,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       try {
         const result = await getQuizs();
         
-
+        toast(result.length)
         if (result.length) {
           toast(`quiz récuperé`)
           setQuizsList(result as QuizFormValues[]);
