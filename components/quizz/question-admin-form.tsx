@@ -315,7 +315,8 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
               {/** Quiz(s) */}
 
               <div className="text-center text-gray-900 bg-gray-200/40 p-3">
-                  Quiz :{" "}
+                  
+                  {selectedQuiz}
                   {JSON.stringify(quizsList)}
                 </div>
 
