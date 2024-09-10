@@ -250,6 +250,8 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
 
         console.log("result");
         console.log(result)
+        console.log(result.length)
+        console.log("tzt end result")
 
         if (result) {
           setQuizsList(result as QuizFormValues[]);
