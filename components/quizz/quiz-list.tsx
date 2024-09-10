@@ -40,8 +40,8 @@ function QuizsList({
   const rowRefs = useRef<Map<string, HTMLTableRowElement | null>>(new Map());
 
   useEffect(() => {
-    if (initialData && typeof initialData.then === "function") {
-      initialData.then((results) => {
+    if (initialData && typeof Promise.resolve(initialData).then === "function") {
+      Promise.resolve(initialData).then((results) => {
         setQuizs(results);
         setFilteredQuizs(results);
       });
