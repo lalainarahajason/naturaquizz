@@ -189,9 +189,12 @@ export const getQuizs = async(): Promise<QuizFormValues[]> => {
         }
     });
 
-    console.log(quizs);
+    const serializedQuizs = JSON.parse(JSON.stringify(quizs));
 
-    return quizs as QuizFormValues[]; // Add type assertion
+    console.log("serialized");
+    console.log(serializedQuizs)
+
+    return serializedQuizs as QuizFormValues[]; // Add type assertion
 }
 
 

@@ -208,7 +208,6 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   };
 
   useEffect(() => {
-
     const fetchQuestionById = async () => {
       const result = await getQuestionById(params.id);
 
@@ -242,26 +241,29 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
         });
 
         setSelectedQuiz(result.quizId as string);
-
       }
     };
 
     const fetchQuizs = async (): Promise<void> => {
       try {
         const result = await getQuizs();
-      
-        
+
         if (result.length) {
           setQuizsList(result as QuizFormValues[]);
         } else {
-          toast(`quiz error`)
+          toast(`quiz error`);
           setError({
             type: "warning",
             message: "Attention, aucun quiz trouvé dans la base",
           });
         }
       } catch (error) {
+        console.error("Failed to fetch quizzes:", error);
         toast("Failed to fetch quizzes");
+        setError({
+          type: "error",
+          message: "Failed to fetch quizzes. Please try again later.",
+        });
       }
     };
 
@@ -308,7 +310,8 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
 
               {mode === "edit" && (
                 <div className="text-center text-gray-900 bg-gray-200/40 p-3">
-                  Quiz : {quizsList.find((quiz) => quiz.id === selectedQuiz)?.title ||
+                  Quiz :{" "}
+                  {quizsList.find((quiz) => quiz.id === selectedQuiz)?.title ||
                     ""}
                 </div>
               )}
