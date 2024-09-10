@@ -213,6 +213,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       const result = await getQuestionById(params.id);
 
       if (result) {
+
         setInitialData({
           question: result.question,
           timer: result.timer,
@@ -316,7 +317,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
 
               <div className="text-center text-gray-900 bg-gray-200/40 p-3">
                   
-                  {selectedQuiz} test
+                  {initialData?.quizId} test
                 </div>
 
               {quizsList && (
