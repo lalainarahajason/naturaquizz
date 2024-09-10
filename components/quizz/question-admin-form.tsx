@@ -252,8 +252,6 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       
         
         if (result.length) {
-          console.log("result")
-          console.log(result)
           setQuizsList(result as QuizFormValues[]);
         } else {
           toast(`quiz error`)

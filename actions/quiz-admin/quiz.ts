@@ -189,6 +189,8 @@ export const getQuizs = async(): Promise<QuizFormValues[]> => {
         }
     });
 
+    console.log(quizs);
+
     return quizs as QuizFormValues[]; // Add type assertion
 }
 
