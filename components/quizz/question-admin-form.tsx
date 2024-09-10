@@ -79,7 +79,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
     defaultValues: {
       quizId: "",
       question: "",
-      note:"",
+      note: "",
       image: "",
       timer: 60,
       answers: [{ text: "", isCorrect: false, order: 0 }],
@@ -185,7 +185,6 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
               });
 
               toast(result.success);
-
             } else {
               toast(result.error as string);
             }
@@ -211,15 +210,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   useEffect(() => {
 
     const fetchQuestionById = async () => {
-
       const result = await getQuestionById(params.id);
 
       if (result) {
-
         setInitialData({
           question: result.question,
           timer: result.timer,
-          note:result.note as string,
+          note: result.note as string,
           answers: result.answers,
           quizId: result.quizId as string,
           image: result.image || undefined,
@@ -239,14 +236,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
           question: result.question,
           timer: result.timer,
           answers: result.answers,
-          quizId: result.quizId || undefined,
-          image: result.image || undefined,
-          note: result.note || undefined
+          quizId: result.quizId as string,
+          image: result.image as string,
+          note: result.note as string,
         });
 
-        //const currentQuiz = quizsList.find((quiz) => quiz.id === result.quizId);
+        setSelectedQuiz(result.quizId as string);
 
-        setSelectedQuiz(result.quizId || "");
       }
     };
 
@@ -308,6 +304,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
 
+              {mode === "edit" && (
+                <div className="text-center text-gray-900 bg-gray-200/40 p-3">
+                  Quiz : {quizsList.find((quiz) => quiz.id === selectedQuiz)?.title ||
+                    ""}
+                </div>
+              )}
+
               {quizsList && (
                 <FormField
                   control={form.control}
@@ -317,8 +320,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                       <Select
                         onValueChange={(value) => {
                           field.onChange(value);
-                          setSelectedQuiz(value);
-                          setError(null);
+                          setSelectedQuiz(() => {
+                            setError(null);
+                            return (
+                              quizsList.find((quiz) => quiz.id === value)
+                                ?.title || ""
+                            );
+                          });
                         }}
                         value={field.value}
                       >
