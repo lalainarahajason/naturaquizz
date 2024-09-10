@@ -209,11 +209,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   };
 
   useEffect(() => {
+
     const fetchQuestionById = async () => {
+
       const result = await getQuestionById(params.id);
+
       if (result) {
 
-        console.log(result)
         setInitialData({
           question: result.question,
           timer: result.timer,
@@ -242,11 +244,9 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
           note: result.note || undefined
         });
 
-        const currentQuiz = quizsList.find((quiz) => quiz.id === result.quizId);
+        //const currentQuiz = quizsList.find((quiz) => quiz.id === result.quizId);
 
-        if (currentQuiz) {
-          setSelectedQuiz(currentQuiz.title);
-        }
+        setSelectedQuiz(result.quizId || "");
       }
     };
 
@@ -271,7 +271,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       fetchQuestionById();
     }
     fetchQuizs();
-  }, [params.id]);
+  }, [params.id, form]);
 
   return (
     <RoleGate allowedRole="ADMIN">
@@ -317,13 +317,8 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                       <Select
                         onValueChange={(value) => {
                           field.onChange(value);
-                          setSelectedQuiz(() => {
-                            setError(null);
-                            return (
-                              quizsList.find((quiz) => quiz.id === value)
-                                ?.title || ""
-                            );
-                          });
+                          setSelectedQuiz(value);
+                          setError(null);
                         }}
                         value={field.value}
                       >
