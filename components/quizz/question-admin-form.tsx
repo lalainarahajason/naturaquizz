@@ -316,7 +316,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
               {mode === "edit" && (
                 <div className="text-center text-gray-900 bg-gray-200/40 p-3">
                   Quiz :{" "}
-                  {quizsList.find((quiz) => quiz.id === "cm0wbw3cl0000upjhws8da2lj")?.title ||
+                  {quizsList.find((quiz) => quiz.id && quiz.id === "cm0wbw3cl0000upjhws8da2lj")?.title ||
                     ""}
                 </div>
               )}
