@@ -316,9 +316,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
 
-              <div className="text-center text-gray-900 bg-gray-200/40 p-3">
-                  {initialData?.quizId}
-                </div>
+          
 
               {initialData && quizsList && (
                 <FormField
@@ -328,13 +326,9 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                     <FormItem>
                       <Select
                         onValueChange={(value) => {
-                          
                           field.onChange(value);
                           setSelectedQuiz(() => {
-                            setError({
-                              message: initialData.quizId as string,
-                              type: "error",
-                            });
+                            setError(null);
                             return (
                               quizsList.find((quiz) => quiz.id === value)
                                 ?.title || ""
