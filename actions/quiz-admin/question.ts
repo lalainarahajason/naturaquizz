@@ -49,41 +49,61 @@ export const createQuestion = async (question: QuestionFormValues) => {
  *
  * @returns {Promise<{ questions: QuestionWithAnswers[]; totalQuestions: number } | null>} - An array of questions, or an object with an error message if an error occurs.
  */
-export const getQuestions = async (offset:number = 0, limit:number=5) => {
+export const getQuestions = async (offset: number = 0, limit: number = 5, searchQuery: { field: string | "", s: string | "" } = { field: "", s: "" }) => {
   
   if (!isAdmin) {
     throw new Error("Action impossible");
   }
 
-  const questions = await db.question.findMany({
-    skip: offset,   // Skip the number of items specified by offset
-    take: limit,  // Take the specified number of items
-    select: {
-      id: true,
-      question: true,
-      image: true,
-      timer: true,
-      note: true,
-      quizId: true,
-      answers: {
-        select: {
-          id: true,
-          text: true,
-          isCorrect: true,
-          order: true,
-        },
+  const selectedFields = {
+    id: true,
+    question: true,
+    image: true,
+    timer: true,
+    note: true,
+    quizId: true,
+    answers: {
+      select: {
+        id: true,
+        text: true,
+        isCorrect: true,
+        order: true,
       },
     },
-  });
+  }
 
-  
+  const query: {
+    skip: number;
+    take: number;
+    select: typeof selectedFields;
+    where?: {
+      [key: string]: {
+        contains: string;
+        mode: "insensitive";
+      };
+    };
+  } = {
+    skip: offset,
+    take: limit,
+    select: selectedFields,
+  }
+
+  if (searchQuery.field && searchQuery.s) {
+    query.where = {
+      [searchQuery.field]: {
+        contains: searchQuery.s,
+        mode: "insensitive",
+      },
+    }
+  }
+
+  const questions = await db.question.findMany(query);
 
   // Optionally, fetch the total count of questions for pagination
   const totalQuestions = await db.question.count();
 
   return { questions, totalQuestions };
 };
-
 /**
  * Retrieves a question by its ID, including its associated answers.
  *

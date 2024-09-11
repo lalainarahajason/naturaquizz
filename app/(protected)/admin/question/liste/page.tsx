@@ -52,6 +52,8 @@ function ListeQuiz() {
   ); // Filtered list
   const searchParams = useSearchParams();
 
+  const [filterValue, setFilterValue] = useState<string| "">("");
+
   const [quizs, setQuizs] = useState<Map<string, string>>();
 
   const rowRefs = useRef<Map<string, HTMLTableRowElement | null>>(new Map());
@@ -59,11 +61,19 @@ function ListeQuiz() {
   const filterByQuiz = searchParams.get("filterByQuiz");
 
   const fetchQuestions = async (page: number) => {
+
     const offset = (page - 1) * pagination.pageSize;
 
     try {
+
+      const filterQuery = {
+        field:"quizId" as string,
+        s: filterValue as string
+      } ;
+
+    
       const { questions: fetchedQuestions, totalQuestions } =
-        await getQuestions(offset, pagination.pageSize);
+        await getQuestions(offset, pagination.pageSize, filterQuery);
 
       if (fetchedQuestions) {
         setQuestions(fetchedQuestions);
@@ -107,29 +117,16 @@ function ListeQuiz() {
     }
   };
 
-  // Render page numbers
-  const RenderPagination = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(
-        <Button
-          key={i}
-          variant={i === pagination.currentPage ? "default" : "outline"}
-          onClick={() => handlePageChange(i)}
-        >
-          {i}
-        </Button>
-      );
-    }
-    return <div className="flex space-x-2">{pageNumbers}</div>;
-  };
-
   useEffect(() => {
+
     startTransition(() => {
+
       fetchQuestions(pagination.currentPage);
+      
       fetchQuizs();
+
     });
-  }, [pagination.currentPage]);
+  }, [pagination.currentPage, filterByQuiz, filterValue]);
 
   useEffect(() => {
     if (filterByQuiz && questions && quizs) {
@@ -149,7 +146,9 @@ function ListeQuiz() {
   );
 
   const handleFilter = (value: string) => {
-    if (questions) {
+    
+    /* if (questions) {
+
       const filteredQuestions = questions.filter((question) => {
         const quizTitle = quizs?.get(question.quizId as string);
         return (
@@ -157,8 +156,13 @@ function ListeQuiz() {
           quizTitle?.toLowerCase().includes(value.toLowerCase())
         );
       });
-      console.log(filteredQuestions);
+
+      
       setFilteredQuestions(filteredQuestions);
+    }*/
+
+    if(value) {
+        setFilterValue(value)
     }
   };
 
@@ -226,9 +230,9 @@ function ListeQuiz() {
                   Aucun résultat, essayez une autre filtre
                 </div>
                 <FilterItems
-                  defaultValue={filterByQuiz || ""}
                   handleFilter={handleFilter}
                   placeholder="Filtrer par quiz..."
+                  data={quizs}
                 />
               </div>
             )}
@@ -237,13 +241,15 @@ function ListeQuiz() {
               <>
                 {isPending && <Loading />}
 
-                {!isPending && (
-                  <>
-                    <FilterItems
-                      defaultValue={filterByQuiz || ""}
+                <FilterItems
                       handleFilter={handleFilter}
                       placeholder="Filtrer par quiz..."
-                    />
+                      data={quizs}
+                />
+
+                {!isPending && (
+                  <>
+                    
                     <Table>
                       <TableHeader>
                         <TableRow>
