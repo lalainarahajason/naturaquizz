@@ -187,7 +187,7 @@ function ListeQuiz() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[150px]">Question</TableHead>
+                      <TableHead className="max-w-[300px]">Question</TableHead>
                       <TableHead>Quiz</TableHead>
                       <TableHead>Timer</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
