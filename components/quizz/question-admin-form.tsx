@@ -209,12 +209,10 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   };
 
   useEffect(() => {
-
     const fetchQuestionById = async () => {
       const result = await getQuestionById(params.id);
 
       if (result) {
-
         setInitialData({
           question: result.question,
           timer: result.timer,
@@ -252,9 +250,9 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
         const result = await getQuizs();
 
         console.log("result");
-        console.log(result)
-        console.log(result.length)
-        console.log("tzt end result")
+        console.log(result);
+        console.log(result.length);
+        console.log("tzt end result");
 
         if (result.length) {
           setQuizsList(result as QuizFormValues[]);
@@ -315,9 +313,6 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
             </CardHeader>
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
-
-          
-
               {initialData && quizsList && (
                 <FormField
                   control={form.control}
