@@ -313,7 +313,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
             </CardHeader>
             <CardContent className="grid grid-flow-row gap-4">
               {/** Quiz(s) */}
-              {initialData && quizsList && (
+              {quizsList && (
                 <FormField
                   control={form.control}
                   name="quizId"
