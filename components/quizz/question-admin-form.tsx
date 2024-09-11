@@ -331,8 +331,10 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                           
                           field.onChange(value);
                           setSelectedQuiz(() => {
-                            setError(null);
-                            console.log(value)
+                            setError({
+                              message: value,
+                              type: "error",
+                            });
                             return (
                               quizsList.find((quiz) => quiz.id === value)
                                 ?.title || ""
