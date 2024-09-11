@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteQuiz, getQuizById, getQuizs } from "@/actions/quiz-admin/quiz";
+import { getQuizs } from "@/actions/quiz-admin/quiz";
 import { Question, Quiz } from "@prisma/client";
 import {
   useState,
@@ -8,27 +8,21 @@ import {
   useTransition,
   useRef,
   useCallback,
-  RefObject,
 } from "react";
 
 import { useSearchParams } from "next/navigation";
-
-import Loading from "@/components/loading";
 
 import { toast } from "sonner";
 
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
-import moment from "moment";
 import Link from "next/link";
 
 import { Trash2, Edit, LayoutGrid } from "lucide-react";
@@ -39,41 +33,88 @@ import AddItem from "../../_components/add-item";
 import { FilterItems } from "@/app/(protected)/admin/_components/filter";
 import { Badge } from "@/components/ui/badge";
 
+import Pagination from "@/components/pagination";
+
 function ListeQuiz() {
   const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [totalQuestions, setTotalQuestions] = useState<number>(0);
+  const [pageSize] = useState(5); // Page size (number of items per page)
+  const [currentPage, setCurrentPage] = useState(1); // Current page number
+  const totalPages = Math.ceil(totalQuestions / pageSize); // Total number of pages
+
+  const [isPending, startTransition] = useTransition();
+
   const [filteredQuestions, setFilteredQuestions] = useState<Question[] | null>(
     null
   ); // Filtered list
   const searchParams = useSearchParams();
 
   const [quizs, setQuizs] = useState<Map<string, string>>();
-  const [isPending, startTransition] = useTransition();
 
   const rowRefs = useRef<Map<string, HTMLTableRowElement | null>>(new Map());
 
   const filterByQuiz = searchParams.get("filterByQuiz");
 
+  const fetchQuestions = async (page: number) => {
+    const offset = (page - 1) * pageSize;
+
+    try {
+      const { questions: fetchedQuestions, totalQuestions } =
+        await getQuestions(offset, pageSize);
+
+      if (fetchedQuestions) {
+        setQuestions(fetchedQuestions);
+        setFilteredQuestions(fetchedQuestions);
+        setTotalQuestions(totalQuestions); // Update total number of questions
+      }
+    } catch (error) {
+      toast((error as Error).message);
+    }
+  };
+
+  const fetchQuizs = async () => {
+    const quizsData = await getQuizs();
+
+    if (quizsData) {
+      const quizMap = new Map<string, string>();
+      quizsData.forEach((quiz) => {
+        quizMap.set(quiz.id as string, quiz.title);
+        setQuizs(quizMap);
+      });
+    }
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    console.log(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // Render page numbers
+  const RenderPagination = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <Button
+          key={i}
+          variant={i === currentPage ? "default" : "outline"}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </Button>
+      );
+    }
+    return <div className="flex space-x-2">{pageNumbers}</div>;
+  };
+
   useEffect(() => {
     startTransition(() => {
-      getQuestions()
-        .then((results) => {
-          setQuestions(results);
-          setFilteredQuestions(results);
-
-          // get quizs
-          getQuizs().then((quizData) => {
-            const quizMap = new Map<string, string>();
-            quizData.forEach((quiz) => {
-              quizMap.set(quiz.id as string, quiz.title);
-              setQuizs(quizMap);
-            });
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      fetchQuestions(currentPage);
+      fetchQuizs();
     });
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => {
     if (filterByQuiz && questions && quizs) {
@@ -139,7 +180,7 @@ function ListeQuiz() {
 
           setFilteredQuestions(() => {
             return newQuestions.filter((question) => question.id !== id);
-          })
+          });
 
           toast(response.success);
         }
@@ -239,6 +280,10 @@ function ListeQuiz() {
                     })}
                   </TableBody>
                 </Table>
+                {/* Pagination Controls */}
+                <div className="flex justify-center my-4">
+                  <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                </div>
               </>
             )}
           </>
