@@ -249,12 +249,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
       try {
         const result = await getQuizs();
 
-        console.log("result");
-        console.log(result);
-        console.log(result.length);
-        console.log("tzt end result");
-
-        if (result.length) {
+        if (result?.length) {
           setQuizsList(result as QuizFormValues[]);
         } else {
           toast(`quiz error`);

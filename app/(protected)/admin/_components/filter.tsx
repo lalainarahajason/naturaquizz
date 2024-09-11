@@ -1,33 +1,58 @@
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { QuizFormValues } from "@/schemas/quiz";
+
 import { useState, useEffect } from "react";
 
 export const FilterItems = ({
   handleFilter,
   placeholder,
-  defaultValue = "",
+  data
 }: {
   handleFilter: CallableFunction;
   placeholder: string;
-  defaultValue: string;
-}) => {
-    
-  const [inputValue, setInputValue] = useState(defaultValue);
+  data: Map<string, string> | undefined
 
-  useEffect(() => {
-    setInputValue(defaultValue);
-  }, [defaultValue]);
+}) => {
+
+  const [selectedFilter, setSelectedFilter] = useState<string | "">("")
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
-                  value={inputValue}
+      
+        <Select
+          onValueChange={(value) => {
+            handleFilter(value);
+            setSelectedFilter(value)
+          }}
+          defaultValue={selectedFilter}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>{placeholder}</SelectLabel>
 
-          placeholder={placeholder}
-          onChange={(event) => setInputValue(event.target.value)}
-          onBlur={(event) => handleFilter(inputValue)}
-          className="max-w-sm"
-        />
+              {/** display data */}
+              {Array.from(data?.entries() ?? []).map(([id, title]) => (
+                <SelectItem key={id} value={id}>
+                  {title}
+                </SelectItem>
+              ))}
+              
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

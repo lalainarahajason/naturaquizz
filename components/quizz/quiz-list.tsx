@@ -131,11 +131,7 @@ function QuizsList({
                 </h2>
               </>
             </div>
-            <FilterItems
-              defaultValue=""
-              handleFilter={handleFilter}
-              placeholder="Trouver un quiz..."
-            />
+            
             <Table>
               <TableHeader>
                 <TableRow>
