@@ -2,13 +2,7 @@
 
 import { getQuizs } from "@/actions/quiz-admin/quiz";
 import { Question, Quiz } from "@prisma/client";
-import {
-  useState,
-  useEffect,
-  useTransition,
-  useRef,
-  useCallback,
-} from "react";
+import { useState, useEffect, useTransition, useRef, useCallback } from "react";
 
 import { useSearchParams } from "next/navigation";
 
@@ -34,13 +28,22 @@ import { FilterItems } from "@/app/(protected)/admin/_components/filter";
 import { Badge } from "@/components/ui/badge";
 
 import Pagination from "@/components/pagination";
+import Loading from "@/components/loading";
 
 function ListeQuiz() {
   const [questions, setQuestions] = useState<Question[] | null>(null);
-  const [totalQuestions, setTotalQuestions] = useState<number>(0);
-  const [pageSize] = useState(5); // Page size (number of items per page)
-  const [currentPage, setCurrentPage] = useState(1); // Current page number
-  const totalPages = Math.ceil(totalQuestions / pageSize); // Total number of pages
+
+  const [pagination, setPagination] = useState<{
+    totalQuestions: number;
+    pageSize: number;
+    currentPage: number;
+  }>({
+    totalQuestions: 0,
+    pageSize: 5,
+    currentPage: 1,
+  });
+
+  const totalPages = Math.ceil(pagination.totalQuestions / pagination.pageSize); // Total number of pages
 
   const [isPending, startTransition] = useTransition();
 
@@ -56,16 +59,23 @@ function ListeQuiz() {
   const filterByQuiz = searchParams.get("filterByQuiz");
 
   const fetchQuestions = async (page: number) => {
-    const offset = (page - 1) * pageSize;
+    const offset = (page - 1) * pagination.pageSize;
 
     try {
       const { questions: fetchedQuestions, totalQuestions } =
-        await getQuestions(offset, pageSize);
+        await getQuestions(offset, pagination.pageSize);
 
       if (fetchedQuestions) {
         setQuestions(fetchedQuestions);
         setFilteredQuestions(fetchedQuestions);
-        setTotalQuestions(totalQuestions); // Update total number of questions
+        //setTotalQuestions(totalQuestions); // Update total number of questions
+
+        setPagination((prevPagination) => {
+          return {
+            ...prevPagination,
+            totalQuestions,
+          };
+        }); // Update total number of questions
       }
     } catch (error) {
       toast((error as Error).message);
@@ -86,9 +96,14 @@ function ListeQuiz() {
 
   // Handle page change
   const handlePageChange = (page: number) => {
-    console.log(page);
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      //setCurrentPage(page);
+      setPagination((prevPagination) => {
+        return {
+          ...prevPagination,
+          currentPage: page,
+        };
+      });
     }
   };
 
@@ -99,7 +114,7 @@ function ListeQuiz() {
       pageNumbers.push(
         <Button
           key={i}
-          variant={i === currentPage ? "default" : "outline"}
+          variant={i === pagination.currentPage ? "default" : "outline"}
           onClick={() => handlePageChange(i)}
         >
           {i}
@@ -111,10 +126,10 @@ function ListeQuiz() {
 
   useEffect(() => {
     startTransition(() => {
-      fetchQuestions(currentPage);
+      fetchQuestions(pagination.currentPage);
       fetchQuizs();
     });
-  }, [currentPage]);
+  }, [pagination.currentPage]);
 
   useEffect(() => {
     if (filterByQuiz && questions && quizs) {
@@ -220,70 +235,82 @@ function ListeQuiz() {
 
             {filteredQuestions.length > 0 && (
               <>
-                <FilterItems
-                  defaultValue={filterByQuiz || ""}
-                  handleFilter={handleFilter}
-                  placeholder="Filtrer par quiz..."
-                />
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="lg:w-[350px]">Question</TableHead>
-                      <TableHead>Quiz</TableHead>
-                      <TableHead>Timer</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredQuestions.map((question, index) => {
-                      return (
-                        <TableRow key={index} ref={setRowRef(question.id)}>
-                          <TableCell>
-                            <h1>
-                              <Link
-                                href={`/admin/question/${question.id}`}
-                                className="hover:underline underline-offset-2"
-                              >
-                                {question.question}
-                              </Link>
-                            </h1>
-                          </TableCell>
-                          <TableCell>
-                            {question.quizId ? (
-                              <Link href={`/admin/quiz/${question.quizId}`}>
-                                <Badge variant="success">
-                                  {quizs?.get(question.quizId as string)}
-                                </Badge>
-                              </Link>
-                            ) : (
-                              <Badge variant="outline">non classé</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>{`${question.timer} s`}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-x-2">
-                              <Link href={`/admin/quiz/${question.id}`}>
-                                <Edit className="cursor-pointer" />
-                              </Link>
-                              <Button
-                                variant="link"
-                                onClick={() =>
-                                  handleDeleteQuestion(question.id)
-                                }
-                              >
-                                <Trash2 className="cursor-pointer text-red-600" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                {isPending && <Loading />}
+
+                {!isPending && (
+                  <>
+                    <FilterItems
+                      defaultValue={filterByQuiz || ""}
+                      handleFilter={handleFilter}
+                      placeholder="Filtrer par quiz..."
+                    />
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="lg:w-[350px]">
+                            Question
+                          </TableHead>
+                          <TableHead>Quiz</TableHead>
+                          <TableHead>Timer</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-                {/* Pagination Controls */}
-                <div className="flex justify-center my-4">
-                  <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredQuestions.map((question, index) => {
+                          return (
+                            <TableRow key={index} ref={setRowRef(question.id)}>
+                              <TableCell>
+                                <h1>
+                                  <Link
+                                    href={`/admin/question/${question.id}`}
+                                    className="hover:underline underline-offset-2"
+                                  >
+                                    {question.question}
+                                  </Link>
+                                </h1>
+                              </TableCell>
+                              <TableCell>
+                                {question.quizId ? (
+                                  <Link href={`/admin/quiz/${question.quizId}`}>
+                                    <Badge variant="success">
+                                      {quizs?.get(question.quizId as string)}
+                                    </Badge>
+                                  </Link>
+                                ) : (
+                                  <Badge variant="outline">non classé</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>{`${question.timer} s`}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-x-2">
+                                  <Link href={`/admin/quiz/${question.id}`}>
+                                    <Edit className="cursor-pointer" />
+                                  </Link>
+                                  <Button
+                                    variant="link"
+                                    onClick={() =>
+                                      handleDeleteQuestion(question.id)
+                                    }
+                                  >
+                                    <Trash2 className="cursor-pointer text-red-600" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                    {/* Pagination Controls */}
+                    <div className="flex justify-center my-4">
+                      <Pagination
+                        currentPage={pagination.currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                      />
+                    </div>
+                  </>
+                )}
               </>
             )}
           </>

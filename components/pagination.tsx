@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 
 interface PaginationProps {
   currentPage: number;
-  totalPages: number;
+  totalPages:number;
   onPageChange: (page: number) => void;
 }
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+  // Calculate total pages
 
-  const RenderPaginationButtons = () => {
+  const renderPaginationButtons = () => {
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
       pageNumbers.push(
@@ -26,7 +27,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
 
   return (
     <div className="flex justify-center my-4">
-      <RenderPaginationButtons />
+      {renderPaginationButtons()}
     </div>
   );
 };
