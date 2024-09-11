@@ -49,7 +49,7 @@ export const createQuestion = async (question: QuestionFormValues) => {
  *
  * @returns {Promise<Question[]|null>} - An array of questions, or an object with an error message if an error occurs.
  */
-export const getQuestions = async (): Promise<Question[] | null> => {
+export const getQuestions = async (offset:number = 0, limit:number=20): Promise<Question[] | null> => {
   if (!isAdmin) {
     throw new Error("Action impossible");
   }
