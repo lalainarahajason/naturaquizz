@@ -209,6 +209,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
   };
 
   useEffect(() => {
+
     const fetchQuestionById = async () => {
       const result = await getQuestionById(params.id);
 
@@ -316,8 +317,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
               {/** Quiz(s) */}
 
               <div className="text-center text-gray-900 bg-gray-200/40 p-3">
-                  
-                  {initialData?.quizId} test
+                  {initialData?.quizId}
                 </div>
 
               {quizsList && (
@@ -328,11 +328,13 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                     <FormItem>
                       <Select
                         onValueChange={(value) => {
+                          
                           field.onChange(value);
                           setSelectedQuiz(() => {
                             setError(null);
+                            console.log(value)
                             return (
-                              quizsList.find((quiz) => quiz.id === initialData?.quizId)
+                              quizsList.find((quiz) => quiz.id === value)
                                 ?.title || ""
                             );
                           });
