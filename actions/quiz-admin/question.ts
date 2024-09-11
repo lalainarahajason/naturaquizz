@@ -47,14 +47,17 @@ export const createQuestion = async (question: QuestionFormValues) => {
  * It checks if the current user is an admin before executing the query.
  * If the user is not an admin, it throws an error.
  *
- * @returns {Promise<Question[]|null>} - An array of questions, or an object with an error message if an error occurs.
+ * @returns {Promise<{ questions: QuestionWithAnswers[]; totalQuestions: number } | null>} - An array of questions, or an object with an error message if an error occurs.
  */
-export const getQuestions = async (): Promise<Question[] | null> => {
+export const getQuestions = async (offset:number = 0, limit:number=5) => {
+  
   if (!isAdmin) {
     throw new Error("Action impossible");
   }
 
   const questions = await db.question.findMany({
+    skip: offset,   // Skip the number of items specified by offset
+    take: limit,  // Take the specified number of items
     select: {
       id: true,
       question: true,
@@ -73,7 +76,12 @@ export const getQuestions = async (): Promise<Question[] | null> => {
     },
   });
 
-  return questions;
+  
+
+  // Optionally, fetch the total count of questions for pagination
+  const totalQuestions = await db.question.count();
+
+  return { questions, totalQuestions };
 };
 
 /**

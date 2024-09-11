@@ -1,34 +1,22 @@
 "use client";
 
-import { deleteQuiz, getQuizById, getQuizs } from "@/actions/quiz-admin/quiz";
+import { getQuizs } from "@/actions/quiz-admin/quiz";
 import { Question, Quiz } from "@prisma/client";
-import {
-  useState,
-  useEffect,
-  useTransition,
-  useRef,
-  useCallback,
-  RefObject,
-} from "react";
+import { useState, useEffect, useTransition, useRef, useCallback } from "react";
 
 import { useSearchParams } from "next/navigation";
-
-import Loading from "@/components/loading";
 
 import { toast } from "sonner";
 
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
-import moment from "moment";
 import Link from "next/link";
 
 import { Trash2, Edit, LayoutGrid } from "lucide-react";
@@ -39,41 +27,109 @@ import AddItem from "../../_components/add-item";
 import { FilterItems } from "@/app/(protected)/admin/_components/filter";
 import { Badge } from "@/components/ui/badge";
 
+import Pagination from "@/components/pagination";
+import Loading from "@/components/loading";
+
 function ListeQuiz() {
   const [questions, setQuestions] = useState<Question[] | null>(null);
+
+  const [pagination, setPagination] = useState<{
+    totalQuestions: number;
+    pageSize: number;
+    currentPage: number;
+  }>({
+    totalQuestions: 0,
+    pageSize: 5,
+    currentPage: 1,
+  });
+
+  const totalPages = Math.ceil(pagination.totalQuestions / pagination.pageSize); // Total number of pages
+
+  const [isPending, startTransition] = useTransition();
+
   const [filteredQuestions, setFilteredQuestions] = useState<Question[] | null>(
     null
   ); // Filtered list
   const searchParams = useSearchParams();
 
   const [quizs, setQuizs] = useState<Map<string, string>>();
-  const [isPending, startTransition] = useTransition();
 
   const rowRefs = useRef<Map<string, HTMLTableRowElement | null>>(new Map());
 
   const filterByQuiz = searchParams.get("filterByQuiz");
 
+  const fetchQuestions = async (page: number) => {
+    const offset = (page - 1) * pagination.pageSize;
+
+    try {
+      const { questions: fetchedQuestions, totalQuestions } =
+        await getQuestions(offset, pagination.pageSize);
+
+      if (fetchedQuestions) {
+        setQuestions(fetchedQuestions);
+        setFilteredQuestions(fetchedQuestions);
+        //setTotalQuestions(totalQuestions); // Update total number of questions
+
+        setPagination((prevPagination) => {
+          return {
+            ...prevPagination,
+            totalQuestions,
+          };
+        }); // Update total number of questions
+      }
+    } catch (error) {
+      toast((error as Error).message);
+    }
+  };
+
+  const fetchQuizs = async () => {
+    const quizsData = await getQuizs();
+
+    if (quizsData) {
+      const quizMap = new Map<string, string>();
+      quizsData.forEach((quiz) => {
+        quizMap.set(quiz.id as string, quiz.title);
+        setQuizs(quizMap);
+      });
+    }
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      //setCurrentPage(page);
+      setPagination((prevPagination) => {
+        return {
+          ...prevPagination,
+          currentPage: page,
+        };
+      });
+    }
+  };
+
+  // Render page numbers
+  const RenderPagination = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <Button
+          key={i}
+          variant={i === pagination.currentPage ? "default" : "outline"}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </Button>
+      );
+    }
+    return <div className="flex space-x-2">{pageNumbers}</div>;
+  };
+
   useEffect(() => {
     startTransition(() => {
-      getQuestions()
-        .then((results) => {
-          setQuestions(results);
-          setFilteredQuestions(results);
-
-          // get quizs
-          getQuizs().then((quizData) => {
-            const quizMap = new Map<string, string>();
-            quizData.forEach((quiz) => {
-              quizMap.set(quiz.id as string, quiz.title);
-              setQuizs(quizMap);
-            });
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      fetchQuestions(pagination.currentPage);
+      fetchQuizs();
     });
-  }, []);
+  }, [pagination.currentPage]);
 
   useEffect(() => {
     if (filterByQuiz && questions && quizs) {
@@ -139,7 +195,7 @@ function ListeQuiz() {
 
           setFilteredQuestions(() => {
             return newQuestions.filter((question) => question.id !== id);
-          })
+          });
 
           toast(response.success);
         }
@@ -179,66 +235,82 @@ function ListeQuiz() {
 
             {filteredQuestions.length > 0 && (
               <>
-                <FilterItems
-                  defaultValue={filterByQuiz || ""}
-                  handleFilter={handleFilter}
-                  placeholder="Filtrer par quiz..."
-                />
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="lg:w-[350px]">Question</TableHead>
-                      <TableHead>Quiz</TableHead>
-                      <TableHead>Timer</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredQuestions.map((question, index) => {
-                      return (
-                        <TableRow key={index} ref={setRowRef(question.id)}>
-                          <TableCell>
-                            <h1>
-                              <Link
-                                href={`/admin/question/${question.id}`}
-                                className="hover:underline underline-offset-2"
-                              >
-                                {question.question}
-                              </Link>
-                            </h1>
-                          </TableCell>
-                          <TableCell>
-                            {question.quizId ? (
-                              <Link href={`/admin/quiz/${question.quizId}`}>
-                                <Badge variant="success">
-                                  {quizs?.get(question.quizId as string)}
-                                </Badge>
-                              </Link>
-                            ) : (
-                              <Badge variant="outline">non classé</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>{`${question.timer} s`}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-x-2">
-                              <Link href={`/admin/quiz/${question.id}`}>
-                                <Edit className="cursor-pointer" />
-                              </Link>
-                              <Button
-                                variant="link"
-                                onClick={() =>
-                                  handleDeleteQuestion(question.id)
-                                }
-                              >
-                                <Trash2 className="cursor-pointer text-red-600" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                {isPending && <Loading />}
+
+                {!isPending && (
+                  <>
+                    <FilterItems
+                      defaultValue={filterByQuiz || ""}
+                      handleFilter={handleFilter}
+                      placeholder="Filtrer par quiz..."
+                    />
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="lg:w-[350px]">
+                            Question
+                          </TableHead>
+                          <TableHead>Quiz</TableHead>
+                          <TableHead>Timer</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredQuestions.map((question, index) => {
+                          return (
+                            <TableRow key={index} ref={setRowRef(question.id)}>
+                              <TableCell>
+                                <h1>
+                                  <Link
+                                    href={`/admin/question/${question.id}`}
+                                    className="hover:underline underline-offset-2"
+                                  >
+                                    {question.question}
+                                  </Link>
+                                </h1>
+                              </TableCell>
+                              <TableCell>
+                                {question.quizId ? (
+                                  <Link href={`/admin/quiz/${question.quizId}`}>
+                                    <Badge variant="success">
+                                      {quizs?.get(question.quizId as string)}
+                                    </Badge>
+                                  </Link>
+                                ) : (
+                                  <Badge variant="outline">non classé</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>{`${question.timer} s`}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-x-2">
+                                  <Link href={`/admin/quiz/${question.id}`}>
+                                    <Edit className="cursor-pointer" />
+                                  </Link>
+                                  <Button
+                                    variant="link"
+                                    onClick={() =>
+                                      handleDeleteQuestion(question.id)
+                                    }
+                                  >
+                                    <Trash2 className="cursor-pointer text-red-600" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                    {/* Pagination Controls */}
+                    <div className="flex justify-center my-4">
+                      <Pagination
+                        currentPage={pagination.currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                      />
+                    </div>
+                  </>
+                )}
               </>
             )}
           </>
