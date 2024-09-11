@@ -283,7 +283,7 @@ function ListeQuiz() {
                               <TableCell>{`${question.timer} s`}</TableCell>
                               <TableCell className="text-right">
                                 <div className="flex items-center justify-end gap-x-2">
-                                  <Link href={`/admin/quiz/${question.id}`}>
+                                  <Link href={`/admin/question/${question.id}`}>
                                     <Edit className="cursor-pointer" />
                                   </Link>
                                   <Button
