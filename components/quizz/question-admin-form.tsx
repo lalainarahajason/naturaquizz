@@ -320,7 +320,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                   {initialData?.quizId}
                 </div>
 
-              {quizsList && (
+              {initialData && quizsList && (
                 <FormField
                   control={form.control}
                   name="quizId"
@@ -332,7 +332,7 @@ function QuestionAdminForm({ mode = "create" }: { mode: string }) {
                           field.onChange(value);
                           setSelectedQuiz(() => {
                             setError({
-                              message: value,
+                              message: initialData.quizId as string,
                               type: "error",
                             });
                             return (
