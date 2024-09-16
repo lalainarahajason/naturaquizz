@@ -70,6 +70,8 @@ export const getQuestions = async (offset: number = 0, limit: number = 5, search
         order: true,
       },
     },
+    createdAt:true,
+    updatedAt:true
   }
 
   const query: {

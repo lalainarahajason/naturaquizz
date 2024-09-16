@@ -78,8 +78,7 @@ export const updateQuiz = async (
 ): Promise<{ error?: string; success?: string; quiz?: QuizFormValues }> => {
 
 
-  const adminStatus = await isAdmin()
-  if (!adminStatus) {
+  if (!isAdmin()) {
     // if user is not admin abort
     return {
       error: "Vous n'avez pas le droit de faire cette action",
@@ -163,10 +162,9 @@ export const deleteQuiz = async (
  */
 export const getQuizs = async (): Promise<QuizFormValues[] | null> => {
 
-  const adminStatus = await isAdmin();
-  if (!adminStatus) {
+  if (!isAdmin()) {
     // throw error
-    //throw new Error("Vous n'avez pas le droit de faire cette action");
+    throw new Error("Vous n'avez pas le droit de faire cette action");
   }
 
   try {
