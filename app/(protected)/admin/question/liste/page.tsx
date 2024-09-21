@@ -1,7 +1,7 @@
 "use client";
 
 import { getQuizs } from "@/actions/quiz-admin/quiz";
-import { Question, Quiz } from "@prisma/client";
+import { Question } from "@prisma/client";
 import { useState, useEffect, useTransition, useRef, useCallback } from "react";
 
 import { useSearchParams } from "next/navigation";
@@ -73,9 +73,6 @@ function ListeQuiz() {
 
       const { questions: fetchedQuestions, totalQuestions } =
         await getQuestions(offset, pagination.pageSize, filterQuery);
-
-        console.log("fetched questions")
-        console.log(fetchedQuestions, totalQuestions)
 
       if (fetchedQuestions) {
         setQuestions(fetchedQuestions);
