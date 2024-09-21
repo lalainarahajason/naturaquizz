@@ -220,6 +220,7 @@ function ListeQuiz() {
                   handleFilter={handleFilter}
                   placeholder="Filtrer par quiz..."
                   data={quizs}
+                  filterValue={filterValue}
                 />
               </div>
             )}
