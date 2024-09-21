@@ -15,12 +15,13 @@ import { useState, useEffect } from "react";
 export const FilterItems = ({
   handleFilter,
   placeholder,
-  data
+  data,
+  filterValue
 }: {
   handleFilter: CallableFunction;
   placeholder: string;
-  data: Map<string, string> | undefined
-
+  data: Map<string, string> | undefined;
+  filterValue:string
 }) => {
 
   const [selectedFilter, setSelectedFilter] = useState<string | "">("")

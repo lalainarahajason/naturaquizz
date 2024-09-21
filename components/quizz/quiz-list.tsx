@@ -159,9 +159,7 @@ function QuizsList({
                         </TableCell>
                         <TableCell className="text-center">
                           <Link
-                            href={`/admin/question/liste?filterByQuiz=${encodeURIComponent(
-                              quiz.title
-                            )}`}
+                            href={`/admin/question/liste?filterByQuiz=${quiz.id}`}
                           >
                             <Badge>{questionsLength}</Badge>
                           </Link>

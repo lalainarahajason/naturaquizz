@@ -39,7 +39,7 @@ function ListeQuiz() {
     currentPage: number;
   }>({
     totalQuestions: 0,
-    pageSize: 5,
+    pageSize: 10,
     currentPage: 1,
   });
 
@@ -71,15 +71,16 @@ function ListeQuiz() {
         s: filterValue as string
       } ;
 
-    
       const { questions: fetchedQuestions, totalQuestions } =
         await getQuestions(offset, pagination.pageSize, filterQuery);
+
+        console.log("fetched questions")
+        console.log(fetchedQuestions, totalQuestions)
 
       if (fetchedQuestions) {
         setQuestions(fetchedQuestions);
         setFilteredQuestions(fetchedQuestions);
-        //setTotalQuestions(totalQuestions); // Update total number of questions
-
+        
         setPagination((prevPagination) => {
           return {
             ...prevPagination,
@@ -146,20 +147,6 @@ function ListeQuiz() {
   );
 
   const handleFilter = (value: string) => {
-    
-    /* if (questions) {
-
-      const filteredQuestions = questions.filter((question) => {
-        const quizTitle = quizs?.get(question.quizId as string);
-        return (
-          question.question.toLowerCase().includes(value.toLowerCase()) ||
-          quizTitle?.toLowerCase().includes(value.toLowerCase())
-        );
-      });
-
-      
-      setFilteredQuestions(filteredQuestions);
-    }*/
 
     if(value) {
         setFilterValue(value)
@@ -245,6 +232,7 @@ function ListeQuiz() {
                       handleFilter={handleFilter}
                       placeholder="Filtrer par quiz..."
                       data={quizs}
+                      filterValue={filterValue}
                 />
 
                 {!isPending && (
