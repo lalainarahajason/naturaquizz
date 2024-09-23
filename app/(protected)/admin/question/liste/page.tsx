@@ -37,13 +37,15 @@ function ListeQuiz() {
     totalQuestions: number;
     pageSize: number;
     currentPage: number;
+    totalPages:number;
   }>({
     totalQuestions: 0,
     pageSize: 10,
     currentPage: 1,
+    totalPages: 0
   });
 
-  const totalPages = Math.ceil(pagination.totalQuestions / pagination.pageSize); // Total number of pages
+  //const totalPages = Math.ceil(pagination.totalQuestions / pagination.pageSize); // Total number of pages
 
   const [isPending, startTransition] = useTransition();
 
@@ -75,6 +77,7 @@ function ListeQuiz() {
         await getQuestions(offset, pagination.pageSize, filterQuery);
 
       if (fetchedQuestions) {
+
         setQuestions(fetchedQuestions);
         setFilteredQuestions(fetchedQuestions);
         
@@ -82,6 +85,7 @@ function ListeQuiz() {
           return {
             ...prevPagination,
             totalQuestions,
+            totalPages: Math.ceil(totalQuestions/prevPagination.pageSize)
           };
         }); // Update total number of questions
       }
@@ -104,7 +108,7 @@ function ListeQuiz() {
 
   // Handle page change
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
+    if (page >= 1 && page <= pagination.totalPages) {
       //setCurrentPage(page);
       setPagination((prevPagination) => {
         return {
@@ -194,6 +198,7 @@ function ListeQuiz() {
   return (
     <div className="w-full">
       <>
+      
         {questions && questions.length === 0 && (
           <NoList
             message="🙄 Aucune question disponible"
@@ -206,7 +211,7 @@ function ListeQuiz() {
           <>
             <h2 className="font-bold text-2xl mb-4 flex items-center gap-2">
               <AddItem href="/admin/question/add" />
-              Toutes les questions
+              Toutes les questions <span className="text text-sm text-black/50"> ({filteredQuestions.length}) </span>
             </h2>
             {filteredQuestions.length === 0 && (
               <div className="bg-gray-100 p-10">
@@ -221,6 +226,8 @@ function ListeQuiz() {
                 />
               </div>
             )}
+
+            
 
             {filteredQuestions.length > 0 && (
               <>
@@ -295,11 +302,12 @@ function ListeQuiz() {
                     </Table>
                     {/* Pagination Controls */}
                     <div className="flex justify-center my-4">
-                      <Pagination
+                      {pagination.totalPages > 1 && <Pagination
                         currentPage={pagination.currentPage}
-                        totalPages={totalPages}
+                        totalPages={pagination.totalPages}
                         onPageChange={handlePageChange}
-                      />
+                      />}
+                      
                     </div>
                   </>
                 )}

@@ -100,7 +100,11 @@ export const getQuestions = async (offset: number = 0, limit: number = 5, search
   const questions = await db.question.findMany(query);
 
   // Optionally, fetch the total count of questions for pagination
-  const totalQuestions = await db.question.count();
+  const totalQuestions = await db.question.count({
+    where: query.where
+  });
+
+  console.log(totalQuestions)
 
   return { questions, totalQuestions };
 };
