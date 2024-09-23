@@ -60,7 +60,7 @@ function ListeQuiz() {
 
   const rowRefs = useRef<Map<string, HTMLTableRowElement | null>>(new Map());
 
-  const filterByQuiz = searchParams.get("filterByQuiz");
+  const filterByQuiz = searchParams.get("filter_by_quiz");
 
   const fetchQuestions = async (page: number) => {
 
@@ -131,10 +131,10 @@ function ListeQuiz() {
   }, [pagination.currentPage, filterByQuiz, filterValue]);
 
   useEffect(() => {
-    if (filterByQuiz && questions && quizs) {
+    if (filterByQuiz) {
       handleFilter(filterByQuiz);
     }
-  }, [filterByQuiz, questions, quizs]); // Run when filterByQuiz, questions, or quizs changes
+  }, [filterByQuiz]); // Run when filterByQuiz, questions, or quizs changes
 
   const setRowRef = useCallback(
     (id: string) => (el: HTMLTableRowElement | null) => {

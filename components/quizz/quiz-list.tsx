@@ -159,7 +159,7 @@ function QuizsList({
                         </TableCell>
                         <TableCell className="text-center">
                           <Link
-                            href={`/admin/question/liste?filterByQuiz=${quiz.id}`}
+                            href={`/admin/question/liste?filter_by_quiz=${quiz.id}`}
                           >
                             <Badge>{questionsLength}</Badge>
                           </Link>
