@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+import { useRouter } from 'next/navigation'
 import {
   Select,
   SelectContent,
@@ -25,6 +25,7 @@ export const FilterItems = ({
 }) => {
 
   const [selectedFilter, setSelectedFilter] = useState<string | "">("")
+  const router = useRouter();
 
   return (
     <div className="w-full">
@@ -32,7 +33,8 @@ export const FilterItems = ({
       
         <Select
           onValueChange={(value) => {
-            handleFilter(value);
+            //handleFilter(value);
+            router.push(`/admin/question/liste?filter_by_quiz=${value}`)
             setSelectedFilter(value)
           }}
           defaultValue={selectedFilter}
