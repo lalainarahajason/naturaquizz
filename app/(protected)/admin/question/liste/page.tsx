@@ -208,7 +208,7 @@ function ListeQuiz() {
           <>
             <h2 className="font-bold text-2xl mb-4 flex items-center gap-2">
               <AddItem href="/admin/question/add" />
-              Toutes les questions <span className="text text-sm text-black/50"> ({filteredQuestions.length}) </span>
+              Toutes les questions <span className="text text-sm text-black/50"> ({pagination.totalQuestions}) </span>
             </h2>
             {filteredQuestions.length === 0 && (
               <div className="bg-gray-100 p-10">
