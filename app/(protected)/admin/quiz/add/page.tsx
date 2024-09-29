@@ -1,5 +1,3 @@
-"use client";
-
 import QuizzAdminForm from "@/components/quizz/quizz-admin-form";
 import { RoleGate } from "@/components/auth/role-gate";
 

@@ -64,39 +64,34 @@ function ListeQuiz() {
 
   const filterByQuiz = searchParams.get("filter_by_quiz");
 
-  const fetchQuestions = async (page: number) => {
-
+  const fetchQuestions = useCallback(async (page: number) => {
     const offset = (page - 1) * pagination.pageSize;
 
     try {
-
       const filterQuery = {
-        field:"quizId" as string,
+        field: "quizId" as string,
         s: filterValue as string
-      } ;
+      };
 
       const { questions: fetchedQuestions, totalQuestions } =
         await getQuestions(offset, pagination.pageSize, filterQuery);
 
       if (fetchedQuestions) {
-
         setQuestions(fetchedQuestions);
         setFilteredQuestions(fetchedQuestions);
         
-        setPagination((prevPagination) => {
-          return {
-            ...prevPagination,
-            totalQuestions,
-            totalPages: Math.ceil(totalQuestions/prevPagination.pageSize)
-          };
-        }); // Update total number of questions
+        setPagination((prevPagination) => ({
+          ...prevPagination,
+          totalQuestions,
+          totalPages: Math.ceil(totalQuestions / prevPagination.pageSize)
+        }));
       }
     } catch (error) {
       toast((error as Error).message);
     }
-  };
+  }, [pagination.pageSize, filterValue]);
 
-  const fetchQuizs = async () => {
+  const fetchQuizs = useCallback(async () => {
     const quizsData = await getQuizs();
 
     if (quizsData) {
@@ -106,10 +101,10 @@ function ListeQuiz() {
         setQuizs(quizMap);
       });
     }
-  };
+  }, []);
 
   // Handle page change
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     if (page >= 1 && page <= pagination.totalPages) {
       //setCurrentPage(page);
       setPagination((prevPagination) => {
@@ -119,7 +114,7 @@ function ListeQuiz() {
         };
       });
     }
-  };
+  }, [pagination.totalPages]);
 
   useEffect(() => {
 
@@ -130,7 +125,7 @@ function ListeQuiz() {
       fetchQuizs();
 
     });
-  }, [pagination.currentPage, filterByQuiz, filterValue]);
+  }, [pagination.currentPage, filterByQuiz, filterValue,fetchQuestions, fetchQuizs]);
 
   useEffect(() => {
     if (filterByQuiz) {

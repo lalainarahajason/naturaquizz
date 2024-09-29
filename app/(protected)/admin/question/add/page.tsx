@@ -1,16 +1,13 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getQuizById } from "@/actions/quiz-admin/quiz";
+import { useState } from "react";
 
-import QuizzAdminForm from "@/components/quizz/quizz-admin-form";
 import { Question } from "@prisma/client";
 import { FormError } from "@/components/form-error";
 
 import { Card, CardHeader, CardContent} from "@/components/ui/card";
 import QuestionAdminForm from "@/components/quizz/question-admin-form";
-import { QuestionFormValues } from "@/schemas/quiz";
 
 function QuestionEdit() {
 
