@@ -4,7 +4,7 @@ import { getQuizs } from "@/actions/quiz-admin/quiz";
 import { Question } from "@prisma/client";
 import { useState, useEffect, useTransition, useRef, useCallback } from "react";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
@@ -53,6 +53,8 @@ function ListeQuiz() {
     null
   ); // Filtered list
   const searchParams = useSearchParams();
+  const pathName = usePathname();
+  const { replace } = useRouter();
 
   const [filterValue, setFilterValue] = useState<string| "">("");
 
