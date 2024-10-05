@@ -44,6 +44,25 @@ import {
             submenus: []
           }
         ]
+      },
+      {
+        groupLabel: "Settings",
+        menus: [
+          {
+            href: "/informations",
+            label: "Informations",
+            active: pathname.includes("/informations"),
+            icon: Settings,
+            submenus: []
+          },
+          {
+            href: "/settings",
+            label: "Account",
+            active: pathname.includes("/settings"),
+            icon: Edit3Icon,
+            submenus: []
+          }
+        ]
       }
     ];
   }

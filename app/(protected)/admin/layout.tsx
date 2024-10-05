@@ -5,7 +5,6 @@ import AdminSidebar from "@/components/sidebar";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
-
 import { CurrentRole } from "@/lib/auth";
 
 async function layout({ children }: { children: React.ReactNode }) {
@@ -14,7 +13,7 @@ async function layout({ children }: { children: React.ReactNode }) {
 
   // If the user is not an admin, return Unauthorized
   if (role === "USER") {
-    redirect("/user-dashboard")
+    redirect("/settings")
   }
 
   return (

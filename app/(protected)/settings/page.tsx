@@ -7,9 +7,7 @@ async function SettingsPage() {
   const session = await auth();
 
   return (
-    <RoleGate allowedRole="ADMIN">
-      <SettingsCard />
-    </RoleGate>
+    <SettingsCard />
   )
 }
 
