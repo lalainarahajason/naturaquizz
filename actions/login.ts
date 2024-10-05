@@ -43,8 +43,6 @@ export const Login = async (
   callbackUrl?: string | null
 ): Promise<LoginResult> => {
 
-  console.log("callbackurl", callbackUrl);
-
   // Valider les champs d'entrée
   const validatedFields = LoginSchema.safeParse(values);
 
