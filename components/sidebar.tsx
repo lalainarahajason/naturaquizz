@@ -10,7 +10,6 @@ import { SidebarToggle } from "@/components/sidebar-toggle";
 import { useStore } from "@/hooks/use-store";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 
-
 import { Menu } from "@/components/menu";
 
 function AdminSidebar() {

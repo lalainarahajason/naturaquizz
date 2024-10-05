@@ -32,7 +32,20 @@ import {
   };
   
   export function getUserMenuList(pathname: string): Group[] {
-    return [];
+    return [
+      {
+        groupLabel: "",
+        menus: [
+          {
+            href: "/dashboard",
+            label: "Dashboard",
+            active: pathname.includes("/dashboard"),
+            icon: AppWindow,
+            submenus: []
+          }
+        ]
+      }
+    ];
   }
 
   export function getAdminMenuList(pathname: string): Group[] {

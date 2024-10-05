@@ -36,27 +36,10 @@ export default auth(async(req) => {
         return;
     }
 
-    if(isLoggedIn) {
-        try {
-            // Check if the user still exists in the database
-            const user = await getUserByEmail(req.auth?.user?.email as string);
-            console.log("user exists", req.auth?.user?.email);
-            console.log(user);
-            if (!user) {
-                // User doesn't exist in the database, force logout
-                // return Response.redirect(new URL("/api/auth/signout", nextUrl))
-            }
-        } catch (error) {
-            console.error("Error checking user existence:", error);
-            // Optionally, you can decide to log out the user on error or allow them to continue
-            // For safety, let's log them out
-            //return Response.redirect(new URL("/api/auth/signout", nextUrl))
-        }
-    }
-
-    if(!isLoggedIn && !isPublicRoute && !isApiQuiz) {
+    if(!isLoggedIn && !isPublicRoute) {
 
         let callbackUrl = nextUrl.pathname;
+        
         if(nextUrl.search) {
             callbackUrl += nextUrl.search;
         }
