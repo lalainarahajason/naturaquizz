@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 import { UserRole } from "@prisma/client";
 
 export async function GET() {
-
+    
     const role = await CurrentRole();
-
+    
     if(role === UserRole.ADMIN) {
 
         return new NextResponse(

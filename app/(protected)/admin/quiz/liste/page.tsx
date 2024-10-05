@@ -7,6 +7,7 @@ import { QuizFormValues } from "@/schemas/quiz";
 async function ListeQuizs() {
   
   const initialData = await getQuizs();
+  
 
   return (
      <QuizsList initialData={initialData as QuizFormValues[]} />

@@ -46,6 +46,7 @@ function QuizsList({
         setFilteredQuizs(results);
       });
     }
+
   }, [initialData]);
 
   const setRowRef = useCallback(

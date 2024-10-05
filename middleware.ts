@@ -6,7 +6,9 @@ import {
     DEFAULT_LOGIN_REDIRECT,
     publicRoutes,  
     authRoutes,
-    apiAuthPrefix
+    apiAuthPrefix,
+    apiQuiz,
+    apiQuizPrefix
 } from "@/routes"
 import { getUserByEmail } from "./data/user";
 
@@ -20,6 +22,8 @@ export default auth(async(req) => {
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
     const isAuthRoute = authRoutes.includes(nextUrl.pathname)
+
+    const isApiQuiz = nextUrl.pathname.startsWith(apiQuizPrefix)
 
     if(isApiAuthRoute) {
         return;
@@ -50,7 +54,7 @@ export default auth(async(req) => {
         }
     }
 
-    if(!isLoggedIn && !isPublicRoute) {
+    if(!isLoggedIn && !isPublicRoute && !isApiQuiz) {
 
         let callbackUrl = nextUrl.pathname;
         if(nextUrl.search) {

@@ -21,6 +21,10 @@ export const authRoutes = [
     "/auth/new-password",
 ]
 
+export const apiQuiz = [
+    "/api/quiz"
+]
+
 /**
  * The prefix for API authentication routes
  * Routes that start with this prefix are used for API
@@ -28,6 +32,8 @@ export const authRoutes = [
  * @type {string}
  */
 export const apiAuthPrefix = "/api/auth"
+
+export const apiQuizPrefix = "/api/quiz"
 
 /**
  * The default redirect path after login in
