@@ -38,32 +38,34 @@ import {
         menus: [
           {
             href: "/dashboard",
-            label: "Dashboard",
+            label: "Tableau de bord",
             active: pathname.includes("/dashboard"),
             icon: AppWindow,
             submenus: []
-          }
-        ]
-      },
-      {
-        groupLabel: "Settings",
-        menus: [
+          },
+          {
+            href: "/quiz",
+            label: "Quiz naturalisation",
+            active: pathname.includes("/dashboard"),
+            icon: LayoutGrid,
+            submenus: []
+          },
           {
             href: "/informations",
-            label: "Informations",
+            label: "Mes informations",
             active: pathname.includes("/informations"),
             icon: Settings,
             submenus: []
           },
           {
             href: "/settings",
-            label: "Account",
+            label: "Mon compte",
             active: pathname.includes("/settings"),
             icon: Edit3Icon,
             submenus: []
           }
         ]
-      }
+      },
     ];
   }
 
