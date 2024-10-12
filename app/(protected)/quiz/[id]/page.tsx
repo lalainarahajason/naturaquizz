@@ -16,7 +16,6 @@ function page() {
   const getQuiz = async () => {
     const response = await getQuizById(params.id);
     if(response) {
-      console.log(response)
       setQuiz(response as QuizFormValues)
     }
   }
