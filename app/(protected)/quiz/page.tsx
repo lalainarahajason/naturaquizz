@@ -1,8 +1,8 @@
-import React from 'react'
+import QuizList from '@/components/quizz/front/quiz-list'
 
 function page() {
   return (
-    <div>page</div>
+    <QuizList />
   )
 }
 

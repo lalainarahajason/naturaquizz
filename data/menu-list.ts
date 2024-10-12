@@ -19,6 +19,7 @@ import {
   };
   
   type Menu = {
+    id:string;
     href: string;
     label: string;
     active: boolean;
@@ -37,6 +38,7 @@ import {
         groupLabel: "",
         menus: [
           {
+            id: "menu-dashboard",
             href: "/dashboard",
             label: "Tableau de bord",
             active: pathname.includes("/dashboard"),
@@ -44,6 +46,7 @@ import {
             submenus: []
           },
           {
+            id: "menu-quiz",
             href: "/quiz",
             label: "Quiz naturalisation",
             active: pathname.includes("/dashboard"),
@@ -51,6 +54,7 @@ import {
             submenus: []
           },
           {
+            id: "menu-informations",
             href: "/informations",
             label: "Mes informations",
             active: pathname.includes("/informations"),
@@ -58,6 +62,7 @@ import {
             submenus: []
           },
           {
+            id: "menu-settings",
             href: "/settings",
             label: "Mon compte",
             active: pathname.includes("/settings"),
@@ -75,6 +80,7 @@ import {
         groupLabel: "",
         menus: [
           {
+            id: "admin-dashboard",
             href: "/admin",
             label: "Dashboard",
             active: pathname.includes("/dashboard"),
@@ -87,6 +93,7 @@ import {
         groupLabel: "Quizz",
         menus: [
           {
+            id: "liste-quiz",
             href: "/admin/quiz/liste",
             label: "Tous les quiz",
             active: pathname.includes("/quiz/liste"),
@@ -94,6 +101,7 @@ import {
             submenus: []
           },
           {
+            id: "ajouter-quiz",
             href: "/admin/quiz/add",
             label: "Ajouter",
             active: pathname.includes("/quiz/add"),
@@ -101,6 +109,7 @@ import {
             submenus: []
           },
           {
+            id: "liste-questions",
             href: "/admin/question/liste",
             label: "Questions",
             active: pathname.includes("/quiz/questions"),
@@ -114,6 +123,7 @@ import {
         groupLabel: "Settings",
         menus: [
           {
+            id: "settings-users",
             href: "/users",
             label: "Users",
             active: pathname.includes("/users"),
@@ -121,6 +131,7 @@ import {
             submenus: []
           },
           {
+            id: "settings-informations",
             href: "/informations",
             label: "Informations",
             active: pathname.includes("/informations"),
@@ -128,6 +139,7 @@ import {
             submenus: []
           },
           {
+            id: "settins-account",
             href: "/settings",
             label: "Account",
             active: pathname.includes("/settings"),

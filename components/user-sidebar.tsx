@@ -5,22 +5,27 @@ import { getUserMenuList } from "@/data/menu-list";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { UserButton } from "./auth/user-button";
 
 function UserSidebar() {
   const pathname = usePathname();
   const menuList = getUserMenuList(pathname);
 
   return (
-    <div className="flex flex-col bg-indigo-500 rounded-md px-6 py-8">
+    <div className="flex flex-col bg-indigo-500 px-6 py-8 lg:fixed">
       <ScrollArea className="[&>div>div[style]]:!block">
+        <div className=" flex justify-center mb-6">
+            <UserButton />
+        </div>
         <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-3 px-2">
           {menuList.map(({ groupLabel, menus }, index) => (
             <li key={index} className="list-none flex flex-col gap-4">
               {groupLabel && <p className="text-white">{groupLabel}</p>}
               {menus.map(
-                ({ href, label, icon: Icon, active, submenus }, index) =>
+                ({ id, href, label, icon: Icon, active, submenus }, index) =>
                   submenus.length === 0 ? (
-                    <Link
+                    <Link 
+                        key={id}
                       href={href}
                       className="flex items-center text-white"
                     >
@@ -30,7 +35,7 @@ function UserSidebar() {
                       <p>{label}</p>
                     </Link>
                   ) : (
-                    <li>{label}</li>
+                    <li key={id}>{label}</li>
                   )
               )}
             </li>
