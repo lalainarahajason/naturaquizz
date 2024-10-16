@@ -224,6 +224,35 @@ export const deleteQuestion = async (id:string) => {
 
 }
 
+export const getQuestionsByQuizId = async (quizId:string) => {
+  
+    if (!isAdmin) {
+      throw new Error("Action impossible");
+    }
+  
+    if(!quizId) {
+      throw new Error("Id quiz obligatoire");
+    }
+
+    try {
+
+      const questions = await db.question.findMany({
+        where: { quizId }
+      });
+    
+      return questions;
+
+    } catch (error) {
+
+      return {
+        error: (error as Error).message
+      }
+      
+    }
+  
+    
+}
+
 export const isAdmin = async () => {
   const session = await auth();
   return !session || session.user.role !== "ADMIN";
