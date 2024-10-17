@@ -24,7 +24,7 @@ async function ProtectedLayout({ children }: { children: React.ReactNode }) {
         <div className="hidden md:block md:col-span-3">
           <UserSidebar />
         </div>
-        <div className="col-span-12 md:col-span-8 pt-14">{children}</div>
+        <div className="col-span-12 md:col-span-8 pt-10">{children}</div>
       </div>
     );
   }

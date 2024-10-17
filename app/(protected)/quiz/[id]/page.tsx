@@ -5,10 +5,10 @@ import { getQuizById } from "@/actions/quiz-admin/quiz";
 import { useEffect, useState } from "react";
 import { QuizFormValues } from "@/schemas/quiz";
 
+import { useQuizStore } from '@/stores/quizStore';
 
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { getQuestions, getQuestionsByQuizId } from "@/actions/quiz-admin/question";
+import { getQuestionsByQuizId } from "@/actions/quiz-admin/question";
 import { Question } from "@prisma/client";
 
 import {LayoutGrid} from "lucide-react"
@@ -18,6 +18,10 @@ function page() {
   const params = useParams<{id:string}>();
   const [quiz, setQuiz] = useState<QuizFormValues|null>(null);
   const [questions, setQuestions] = useState<Question[]|null>(null);
+
+  const { currentQuestionIndex, setCurrentQuestionIndex, addUserAnswer } = useQuizStore();
+  const [timeLeft, setTimeLeft] = useState<number | undefined>(questions ? questions[currentQuestionIndex]?.timer : undefined);
+
 
   const getQuiz = async () => {
     const quizData = await getQuizById(params.id);
@@ -47,9 +51,9 @@ function page() {
     <div>
       {quiz && (
         <div className="flex flex-col justify-center overflow-hidden items-center gap-6 rounded-lg bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 py-8 px-14 relative">
-          <LayoutGrid className="absolute text-white opacity-35 h-[200px] w-[200px] transform -rotate-12 left-0" />
+          <LayoutGrid className="absolute text-white opacity-20 h-[200px] w-[200px] transform -rotate-12 left-0" />
           {quiz.description && (
-            <h1 className="text-2xl text-white font-semibold uppercase">{ quiz.title }</h1>
+            <h1 className="text-2xl text-white font-extrabold uppercase">{ quiz.title }</h1>
           )}
 
         </div>
