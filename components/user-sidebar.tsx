@@ -12,7 +12,7 @@ function UserSidebar() {
   const menuList = getUserMenuList(pathname);
 
   return (
-    <div className="flex flex-col bg-indigo-500 px-6 py-8 lg:fixed">
+    <div className="flex flex-col bg-indigo-500 px-6 py-8">
       <ScrollArea className="[&>div>div[style]]:!block">
         <div className=" flex justify-center mb-6">
             <UserButton />

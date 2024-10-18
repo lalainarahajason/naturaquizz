@@ -17,14 +17,14 @@ async function ProtectedLayout({ children }: { children: React.ReactNode }) {
     );
   } else {
     return (
-      <div className="md:grid md:grid-cols-12 gap-8 w-full">
+      <div className="md:grid md:grid-cols-12 gap-8 w-full h-screen overflow-hidden">
         <div className="block md:hidden bg-indigo-500 w-full p-4">
           <UserButton />
         </div>
         <div className="hidden md:block md:col-span-3">
           <UserSidebar />
         </div>
-        <div className="col-span-12 md:col-span-8 pt-10">{children}</div>
+        <div className="col-span-12 md:col-span-9 h-screen overflow-y-scroll">{children}</div>
       </div>
     );
   }

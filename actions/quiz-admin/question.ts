@@ -239,15 +239,23 @@ export const getQuestionsByQuizId = async (quizId:string) => {
       const questions = await db.question.findMany({
         where: { quizId }
       });
+
+      // get questions with responses
+      const questionsWithResponses = await Promise.all(questions.map(async (question) => {
+        const answers = await db.answer.findMany({
+          where: { questionId: question.id }
+        });
+        return { ...question, answers, isMultipleChoice:true };
+      }));
     
-      return questions;
+      return questionsWithResponses;
 
     } catch (error) {
 
       return {
         error: (error as Error).message
       }
-      
+
     }
   
     
